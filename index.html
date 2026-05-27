@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SBON - SBOM Viewer</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">SBOM Viewer</p>
+        <h1>SBON</h1>
+      </div>
+      <div class="actions">
+        <button id="loadSampleButton" type="button" class="secondary-button" title="サンプルを読み込む">
+          <span aria-hidden="true">◎</span>
+          サンプル
+        </button>
+        <button id="printButton" type="button" title="PDFとして保存">
+          <span aria-hidden="true">□</span>
+          PDF
+        </button>
+        <button id="csvButton" type="button" title="CSVを書き出す">
+          <span aria-hidden="true">↓</span>
+          CSV
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="input-band">
+        <div class="input-copy">
+          <h2>調達・品質保証・セキュリティ管理向けのSBOM確認</h2>
+          <p>
+            CycloneDX JSON または SPDX JSON を読み込み、OSSコンポーネントを日本語で説明し、
+            脆弱性・ライセンス・保守リスクを確認できます。
+          </p>
+        </div>
+        <label class="dropzone" for="fileInput" id="dropzone">
+          <input id="fileInput" type="file" accept=".json,application/json" />
+          <span class="drop-icon" aria-hidden="true">+</span>
+          <strong>SBOM JSONを選択</strong>
+          <span>またはここへドラッグ</span>
+        </label>
+      </section>
+
+      <section class="summary-grid" aria-label="概要">
+        <article class="metric">
+          <span class="metric-label">総コンポーネント</span>
+          <strong id="totalComponents">0</strong>
+        </article>
+        <article class="metric risk-high">
+          <span class="metric-label">高リスク</span>
+          <strong id="highRiskCount">0</strong>
+        </article>
+        <article class="metric risk-medium">
+          <span class="metric-label">要確認</span>
+          <strong id="mediumRiskCount">0</strong>
+        </article>
+        <article class="metric">
+          <span class="metric-label">既知の脆弱性</span>
+          <strong id="vulnerabilityCount">0</strong>
+        </article>
+      </section>
+
+      <section class="workspace">
+        <aside class="filters" aria-label="絞り込み">
+          <div class="field">
+            <label for="searchInput">検索</label>
+            <input id="searchInput" type="search" placeholder="例: openssl, GPL, CVE" />
+          </div>
+          <div class="field">
+            <label for="riskFilter">リスク</label>
+            <select id="riskFilter">
+              <option value="all">すべて</option>
+              <option value="high">高</option>
+              <option value="medium">中</option>
+              <option value="low">低</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="categoryFilter">レビュー観点</label>
+            <select id="categoryFilter">
+              <option value="all">すべて</option>
+              <option value="crypto">暗号</option>
+              <option value="network">ネットワーク</option>
+              <option value="auth">認証</option>
+              <option value="os">OS基盤</option>
+              <option value="update">更新機構</option>
+              <option value="unknown">不明</option>
+            </select>
+          </div>
+          <div class="review-note">
+            <h2>レビュー要約</h2>
+            <p id="executiveSummary">SBOMを読み込むと、調達・品質保証・セキュリティ管理向けの確認ポイントを表示します。</p>
+          </div>
+        </aside>
+
+        <section class="panel component-panel" aria-label="コンポーネント一覧">
+          <div class="panel-head">
+            <h2>コンポーネント一覧</h2>
+            <span id="formatLabel">未読み込み</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>名称</th>
+                  <th>バージョン</th>
+                  <th>リスク</th>
+                  <th>用途</th>
+                  <th>ライセンス</th>
+                  <th>脆弱性</th>
+                </tr>
+              </thead>
+              <tbody id="componentRows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel detail-panel" aria-label="詳細">
+          <div class="tabs" role="tablist">
+            <button class="tab is-active" data-tab="detail" type="button">詳細</button>
+            <button class="tab" data-tab="tree" type="button">依存関係</button>
+          </div>
+          <div id="detailView" class="tab-page is-active">
+            <p class="empty">一覧からコンポーネントを選択してください。</p>
+          </div>
+          <div id="treeView" class="tab-page">
+            <p class="empty">依存関係情報があるSBOMを読み込むと表示します。</p>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <template id="emptyRowTemplate">
+      <tr>
+        <td colspan="6" class="empty-cell">SBOM JSONを読み込んでください。</td>
+      </tr>
+    </template>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
