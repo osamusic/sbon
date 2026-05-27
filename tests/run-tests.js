@@ -28,6 +28,99 @@ function loadCore() {
   return context.window;
 }
 
+function loadAppWithDom() {
+  const events = new Map();
+  const elements = new Map();
+
+  function mockElement(selector = "") {
+    return {
+      selector,
+      value: selector === "#searchInput" ? "" : "all",
+      textContent: "",
+      innerHTML: "",
+      className: "",
+      tabIndex: 0,
+      dataset: datasetFor(selector),
+      classList: { add() {}, remove() {}, toggle() {} },
+      addEventListener(event, handler) {
+        events.set(`${selector}:${event}`, handler);
+      },
+      append(child) {
+        this.appended = child;
+      },
+      click() {},
+    };
+  }
+
+  function datasetFor(selector) {
+    if (selector.startsWith("sort-")) return { sort: selector.replace("sort-", "") };
+    if (selector === ".tab-detail") return { tab: "detail" };
+    if (selector === ".tab-tree") return { tab: "tree" };
+    return {};
+  }
+
+  const template = mockElement("#emptyRowTemplate");
+  template.content = { cloneNode: () => mockElement("empty-row") };
+
+  function get(selector) {
+    if (selector === "#emptyRowTemplate") return template;
+    if (!elements.has(selector)) elements.set(selector, mockElement(selector));
+    return elements.get(selector);
+  }
+
+  const sortButtons = [
+    "sort-name",
+    "sort-version",
+    "sort-priority",
+    "sort-category",
+    "sort-license",
+    "sort-vulnerabilities",
+  ].map(mockElement);
+
+  const document = {
+    querySelector: get,
+    querySelectorAll(selector) {
+      if (selector === ".tab") return [mockElement(".tab-detail"), mockElement(".tab-tree")];
+      if (selector === ".sort-button") return sortButtons;
+      return [];
+    },
+    createElement(tag) {
+      return mockElement(tag);
+    },
+  };
+
+  const context = {
+    window: { print() {} },
+    document,
+    console,
+    Blob: function Blob() {},
+    URL: { createObjectURL: () => "blob:test", revokeObjectURL() {} },
+    alert(message) {
+      throw new Error(message);
+    },
+  };
+
+  for (const file of [
+    "data/knowledge/packages.js",
+    "data/knowledge/package-identifiers.js",
+    "data/knowledge/categories.js",
+    "data/knowledge/package-categories.js",
+    "data/knowledge/entries-ja.js",
+    "data/knowledge/review-priority-rules.js",
+    "data/knowledge-base.js",
+    "samples/sample-cyclonedx.js",
+    "js/review-priority.js",
+    "js/parser.js",
+    "js/export.js",
+    "js/ui.js",
+    "app.js",
+  ]) {
+    vm.runInNewContext(fs.readFileSync(file, "utf8"), context, { filename: file });
+  }
+
+  return { events, get };
+}
+
 function testCycloneDxSample() {
   const window = loadCore();
   assert.ok(Array.isArray(window.SBON_KNOWLEDGE_BASE.packageIdentifiers));
@@ -144,12 +237,30 @@ function testCsvExportShape() {
   assert.ok(csv.includes("古いOpenSSL系列が使われている可能性があります"));
 }
 
+function testUiInteractions() {
+  const { events, get } = loadAppWithDom();
+
+  events.get("#loadSampleButton:click")();
+  assert.strictEqual(get("#componentCount").textContent, "4 / 4件表示");
+
+  get("#searchInput").value = "openssl";
+  events.get("#searchInput:input")();
+  assert.strictEqual(get("#componentCount").textContent, "1 / 4件表示");
+
+  events.get("#resetFiltersButton:click")();
+  assert.strictEqual(get("#componentCount").textContent, "4 / 4件表示");
+
+  events.get("sort-license:click")();
+  assert.strictEqual(get("#componentCount").textContent, "4 / 4件表示");
+}
+
 function run() {
   testCycloneDxSample();
   testSpdxBasicPackage();
   testAliasMatching();
   testUnknownSbomError();
   testCsvExportShape();
+  testUiInteractions();
   console.log("All tests passed");
 }
 

@@ -125,6 +125,7 @@
               <option value="unknown">不明</option>
             </select>
           </div>
+          <button id="resetFiltersButton" type="button" class="secondary-button full-button">絞り込み解除</button>
           <div class="review-note">
             <h2>レビュー要約</h2>
             <p id="executiveSummary">SBOMを読み込むと、調達・品質保証・セキュリティ管理向けの確認ポイントを表示します。</p>
@@ -134,18 +135,21 @@
         <section class="panel component-panel" aria-label="コンポーネント一覧">
           <div class="panel-head">
             <h2>コンポーネント一覧</h2>
-            <span id="formatLabel">未読み込み</span>
+            <div class="panel-meta">
+              <span id="componentCount">0件表示</span>
+              <span id="formatLabel">未読み込み</span>
+            </div>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>名称</th>
-                  <th>バージョン</th>
-                  <th>確認優先度</th>
-                  <th>用途</th>
-                  <th>ライセンス</th>
-                  <th>脆弱性</th>
+                  <th><button class="sort-button" type="button" data-sort="name">名称</button></th>
+                  <th><button class="sort-button" type="button" data-sort="version">バージョン</button></th>
+                  <th><button class="sort-button" type="button" data-sort="priority">確認優先度</button></th>
+                  <th><button class="sort-button" type="button" data-sort="category">用途</button></th>
+                  <th><button class="sort-button" type="button" data-sort="license">ライセンス</button></th>
+                  <th><button class="sort-button" type="button" data-sort="vulnerabilities">脆弱性</button></th>
                 </tr>
               </thead>
               <tbody id="componentRows"></tbody>

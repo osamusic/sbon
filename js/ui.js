@@ -5,6 +5,8 @@
       components: [],
       dependencies: new Map(),
       selectedId: null,
+      sortKey: "priority",
+      sortDirection: "asc",
     };
 
     const elements = {
@@ -16,6 +18,7 @@
       searchInput: document.querySelector("#searchInput"),
       priorityFilter: document.querySelector("#priorityFilter"),
       categoryFilter: document.querySelector("#categoryFilter"),
+      resetFiltersButton: document.querySelector("#resetFiltersButton"),
       totalComponents: document.querySelector("#totalComponents"),
       highPriorityCount: document.querySelector("#highPriorityCount"),
       mediumPriorityCount: document.querySelector("#mediumPriorityCount"),
@@ -26,10 +29,12 @@
       reportSummary: document.querySelector("#reportSummary"),
       reportRows: document.querySelector("#reportRows"),
       componentRows: document.querySelector("#componentRows"),
+      componentCount: document.querySelector("#componentCount"),
       emptyRowTemplate: document.querySelector("#emptyRowTemplate"),
       detailView: document.querySelector("#detailView"),
       treeView: document.querySelector("#treeView"),
       formatLabel: document.querySelector("#formatLabel"),
+      sortButtons: document.querySelectorAll(".sort-button"),
       tabs: document.querySelectorAll(".tab"),
     };
 
@@ -66,6 +71,13 @@
       elements.searchInput.addEventListener("input", render);
       elements.priorityFilter.addEventListener("change", render);
       elements.categoryFilter.addEventListener("change", render);
+      elements.resetFiltersButton.addEventListener("click", resetFilters);
+
+      for (const button of elements.sortButtons) {
+        button.addEventListener("click", () => {
+          updateSort(button.dataset.sort);
+        });
+      }
 
       for (const tab of elements.tabs) {
         tab.addEventListener("click", () => {
@@ -96,9 +108,11 @@
 
     function render() {
       const filtered = getFilteredComponents();
+      const sorted = sortComponents(filtered);
       renderSummary();
       renderPrintReport();
-      renderRows(filtered);
+      renderRows(sorted);
+      renderListMeta(sorted.length);
       renderDetail();
       renderTree();
     }
@@ -196,6 +210,15 @@
           }
         });
         elements.componentRows.append(row);
+      }
+    }
+
+    function renderListMeta(visibleCount) {
+      elements.componentCount.textContent = `${visibleCount} / ${state.components.length}件表示`;
+      for (const button of elements.sortButtons) {
+        const active = button.dataset.sort === state.sortKey;
+        button.classList.toggle("is-active", active);
+        button.dataset.direction = active ? state.sortDirection : "";
       }
     }
 
@@ -305,6 +328,53 @@
           (category === "all" || component.category === category)
         );
       });
+    }
+
+    function sortComponents(components) {
+      return [...components].sort((a, b) => {
+        const direction = state.sortDirection === "desc" ? -1 : 1;
+        return compareComponents(a, b, state.sortKey) * direction || a.name.localeCompare(b.name);
+      });
+    }
+
+    function compareComponents(a, b, sortKey) {
+      if (sortKey === "priority") {
+        return reviewPriorityRank(a.reviewPriority) - reviewPriorityRank(b.reviewPriority);
+      }
+      if (sortKey === "vulnerabilities") {
+        return a.vulnerabilities.length - b.vulnerabilities.length;
+      }
+      if (sortKey === "category") {
+        return a.categoryLabel.localeCompare(b.categoryLabel);
+      }
+      if (sortKey === "license") {
+        return licenseText(a).localeCompare(licenseText(b));
+      }
+      if (sortKey === "version") {
+        return String(a.version).localeCompare(String(b.version), "ja", { numeric: true });
+      }
+      return a.name.localeCompare(b.name);
+    }
+
+    function updateSort(sortKey) {
+      if (state.sortKey === sortKey) {
+        state.sortDirection = state.sortDirection === "asc" ? "desc" : "asc";
+      } else {
+        state.sortKey = sortKey;
+        state.sortDirection = sortKey === "vulnerabilities" ? "desc" : "asc";
+      }
+      render();
+    }
+
+    function resetFilters() {
+      elements.searchInput.value = "";
+      elements.priorityFilter.value = "all";
+      elements.categoryFilter.value = "all";
+      render();
+    }
+
+    function licenseText(component) {
+      return component.licenses.join(", ") || "未確認";
     }
 
     function selectComponent(id) {

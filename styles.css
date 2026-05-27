@@ -67,6 +67,11 @@ select:focus-visible,
   color: var(--accent);
 }
 
+.full-button {
+  width: 100%;
+  justify-content: center;
+}
+
 .topbar {
   position: sticky;
   top: 0;
@@ -322,7 +327,18 @@ main {
   margin: 0;
 }
 
-#formatLabel {
+.panel-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+#formatLabel,
+#componentCount {
   color: var(--muted);
   font-size: 13px;
 }
@@ -353,6 +369,32 @@ th {
   color: #34424f;
   font-size: 12px;
   text-transform: uppercase;
+}
+
+.sort-button {
+  min-height: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  padding: 2px 4px;
+  font-size: inherit;
+  font-weight: 800;
+  text-transform: inherit;
+}
+
+.sort-button:hover,
+.sort-button.is-active {
+  background: #dbe8ef;
+  color: var(--ink);
+}
+
+.sort-button.is-active::after {
+  content: " ↑";
+}
+
+.sort-button.is-active[data-direction="desc"]::after {
+  content: " ↓";
 }
 
 tr {
