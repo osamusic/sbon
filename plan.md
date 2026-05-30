@@ -108,7 +108,9 @@ SBONは、非エンジニアのSBOM利用者向けに、CycloneDX JSON / SPDX JS
 進捗:
 
 - SPDX 2.3サンプル(supplier/originator/cpe/copyright/relationship含む)を追加し、UIのサンプル切替とテストに組み込み済み
-- 残: ライセンス不明・巨大ファイルなどのエッジケース用サンプル
+- エッジケース用サンプル(`samples/sample-edge-cases.js`)を追加（欠損フィールド、ライセンス不明/NOASSERTION、ライセンス式、名称の特殊文字、複数・高深刻度の脆弱性、深い依存チェーン）。テストで堅牢性を検証
+- 堅牢性改善: CycloneDX/SPDXともに NOASSERTION/NONE をライセンス一覧から除外し「未確認」として扱うよう統一
+- 残: 巨大ファイル時の表示性能（行数が多い場合のレンダリング）
 
 ### 2. 自動テスト
 

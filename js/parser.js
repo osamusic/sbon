@@ -121,14 +121,19 @@
   }
 
   function parseCycloneDxLicenses(licenses = []) {
-    return licenses
+    return (licenses || [])
       .map((item) => item.license?.id || item.license?.name || item.expression)
-      .filter(Boolean);
+      .filter(Boolean)
+      // NOASSERTION / NONE は「未確認」として扱うため、ライセンス一覧からは除外する。
+      .filter((value) => !["noassertion", "none"].includes(String(value).trim().toLowerCase()));
   }
 
   function parseSpdxLicense(pkg) {
     const license = pkg.licenseConcluded || pkg.licenseDeclared;
-    return license ? [license] : [];
+    if (!license || ["noassertion", "none"].includes(String(license).trim().toLowerCase())) {
+      return [];
+    }
+    return [license];
   }
 
   function parseCycloneDxReferences(references = []) {

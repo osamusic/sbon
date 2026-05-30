@@ -20,6 +20,7 @@ function loadCore() {
     "samples/sample-cyclonedx.js",
     "samples/sample-cyclonedx-prev.js",
     "samples/sample-spdx.js",
+    "samples/sample-edge-cases.js",
     "js/review-priority.js",
     "js/parser.js",
     "js/diff.js",
@@ -124,6 +125,7 @@ function loadAppWithDom(localStorage = mockLocalStorage()) {
     "samples/sample-cyclonedx.js",
     "samples/sample-cyclonedx-prev.js",
     "samples/sample-spdx.js",
+    "samples/sample-edge-cases.js",
     "js/review-priority.js",
     "js/parser.js",
     "js/diff.js",
@@ -398,6 +400,47 @@ function testReviewStore() {
   assert.throws(() => restored.loadJSON({}), /reviews/);
 }
 
+function testEdgeCases() {
+  const window = loadCore();
+  const normalized = window.SBON_PARSER.normalizeSbom(window.SBON_SAMPLE_EDGE);
+  assert.strictEqual(normalized.components.length, 5);
+  const byName = new Map(normalized.components.map((c) => [c.name, c]));
+
+  // 欠損だらけの未知コンポーネント。
+  const mystery = byName.get("mystery-lib");
+  assert.strictEqual(mystery.version, "不明");
+  assert.deepStrictEqual(Array.from(mystery.licenses), []);
+  assert.strictEqual(mystery.packageId, null);
+  assert.strictEqual(mystery.category, "unknown");
+  assert.ok(mystery.findings.includes("用途メタデータが不足しています"));
+  assert.ok(mystery.findings.includes("ライセンス情報が未確認です"));
+
+  // ライセンス式は保持する。
+  assert.deepStrictEqual(Array.from(byName.get("dual-licensed").licenses), ["(MIT OR Apache-2.0)"]);
+
+  // NOASSERTION はライセンス一覧から除外され、未確認として扱う。
+  const noAssertion = byName.get("no-assertion-lib");
+  assert.deepStrictEqual(Array.from(noAssertion.licenses), []);
+  assert.ok(noAssertion.findings.includes("ライセンス情報が未確認です"));
+
+  // 名称の特殊文字は正規化段階では生のまま保持（エスケープは表示層の責務）。
+  assert.ok(byName.has("<script>alert(1)</script>"));
+
+  // critical 脆弱性を持つコンポーネントは高優先度。
+  const vulnHeavy = byName.get("vuln-heavy");
+  assert.strictEqual(vulnHeavy.vulnerabilities.length, 2);
+  assert.strictEqual(vulnHeavy.reviewPriority, "high");
+  assert.ok(vulnHeavy.findings.includes("高深刻度の脆弱性があります"));
+
+  // 深い依存チェーンが解析される。
+  assert.strictEqual(normalized.dependencies.size, 3);
+
+  // CSV出力が例外なく生成でき、特殊文字を含む行も出力される。
+  const csv = window.SBON_EXPORT.buildCsv(normalized.components);
+  assert.ok(csv.includes("<script>alert(1)</script>"));
+  assert.ok(csv.includes("(MIT OR Apache-2.0)"));
+}
+
 function testCpeProductExtraction() {
   const window = loadCore();
   const { extractCpeProduct } = window.SBON_REVIEW_PRIORITY;
@@ -497,6 +540,7 @@ function run() {
   testDiffLogic();
   testDiffLicenseAndCsv();
   testReviewStore();
+  testEdgeCases();
   testCpeProductExtraction();
   testAliasMatching();
   testUnknownSbomError();
