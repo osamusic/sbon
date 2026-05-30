@@ -22,6 +22,7 @@
   function matchPackage(component) {
     const knowledgeBase = window.SBON_KNOWLEDGE_BASE;
     const purlName = extractPurlName(component.purl);
+    const cpeProduct = extractCpeProduct(component.cpe);
     const normalizedName = normalizeName(component.name);
 
     for (const identifier of knowledgeBase.packageIdentifiers) {
@@ -33,6 +34,21 @@
         return {
           packageId: identifier.packageId,
           method: "purl-name",
+          value: identifier.value,
+          confidence: identifier.confidence,
+        };
+      }
+    }
+
+    for (const identifier of knowledgeBase.packageIdentifiers) {
+      if (
+        identifier.identifierType === "cpe-product" &&
+        cpeProduct &&
+        normalizeName(identifier.value) === cpeProduct
+      ) {
+        return {
+          packageId: identifier.packageId,
+          method: "cpe-product",
           value: identifier.value,
           confidence: identifier.confidence,
         };
@@ -154,6 +170,17 @@
     return match ? normalizeName(decodeURIComponent(match[1])) : "";
   }
 
+  function extractCpeProduct(cpe) {
+    const value = String(cpe || "");
+    // CPE 2.3: cpe:2.3:a:vendor:product:version:...
+    const cpe23 = value.match(/^cpe:2\.3:[aho*-]:[^:]*:([^:]+)/i);
+    if (cpe23) return normalizeName(cpe23[1]);
+    // CPE 2.2: cpe:/a:vendor:product:version
+    const cpe22 = value.match(/^cpe:\/[aho]:[^:]*:([^:]+)/i);
+    if (cpe22) return normalizeName(cpe22[1]);
+    return "";
+  }
+
   function normalizeName(name) {
     return String(name || "").trim().toLowerCase();
   }
@@ -163,5 +190,6 @@
     matchPackage,
     normalizeSeverity,
     scoreReviewPriority,
+    extractCpeProduct,
   };
 })();

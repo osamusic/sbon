@@ -4,18 +4,26 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>SBON - SBOM Viewer</title>
+    <link rel="icon" type="image/png" href="./sbon_logo.png" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header class="topbar">
-      <div>
-        <p class="eyebrow">SBOM Viewer</p>
-        <h1>SBON</h1>
+      <div class="logo-container">
+        <img src="./sbon_logo.png" alt="SBON Logo" class="sbon-logo" />
+        <div>
+          <p class="eyebrow">SBOM Viewer</p>
+          <h1>SBON</h1>
+        </div>
       </div>
       <div class="actions">
-        <button id="loadSampleButton" type="button" class="secondary-button" title="サンプルを読み込む">
+        <button id="loadSampleButton" type="button" class="secondary-button" title="CycloneDXサンプルを読み込む">
           <span aria-hidden="true">◎</span>
-          サンプル
+          CycloneDX例
+        </button>
+        <button id="loadSpdxSampleButton" type="button" class="secondary-button" title="SPDXサンプルを読み込む">
+          <span aria-hidden="true">◎</span>
+          SPDX例
         </button>
         <button id="printButton" type="button" title="PDFとして保存">
           <span aria-hidden="true">□</span>
@@ -25,6 +33,15 @@
           <span aria-hidden="true">↓</span>
           CSV
         </button>
+        <button id="saveReviewButton" type="button" class="secondary-button" title="レビュー結果をJSONで保存">
+          <span aria-hidden="true">▣</span>
+          レビュー保存
+        </button>
+        <button id="loadReviewButton" type="button" class="secondary-button" title="保存したレビュー結果を読み込む">
+          <span aria-hidden="true">▢</span>
+          レビュー読込
+        </button>
+        <input id="reviewFileInput" type="file" accept=".json,application/json" hidden />
       </div>
     </header>
 
@@ -43,6 +60,13 @@
           <strong>SBOM JSONを選択</strong>
           <span>またはここへドラッグ</span>
         </label>
+        <p id="loadStatus" class="load-status" role="status" aria-live="polite" hidden></p>
+        <div class="compare-loader">
+          <span class="compare-label">リリース差分:</span>
+          <button id="loadCompareButton" type="button" class="secondary-button">比較対象（旧SBOM）を選択</button>
+          <input id="compareFileInput" type="file" accept=".json,application/json" hidden />
+          <button id="loadDiffSampleButton" type="button" class="link-button">サンプルで差分を見る</button>
+        </div>
       </section>
 
       <section class="summary-grid" aria-label="概要">
@@ -82,6 +106,7 @@
           </dl>
         </div>
         <p id="reportSummary">SBOMを読み込むと、印刷用の要約を表示します。</p>
+        <h3 class="report-section-title">経営・調達向け要約</h3>
         <div class="report-table-wrap">
           <table class="report-table">
             <thead>
@@ -96,6 +121,35 @@
             <tbody id="reportRows"></tbody>
           </table>
         </div>
+        <h3 class="report-section-title">技術確認向け詳細</h3>
+        <div id="reportDetails" class="report-details"></div>
+      </section>
+
+      <section id="diffSection" class="panel diff-panel" aria-label="SBOM差分" hidden>
+        <div class="panel-head">
+          <h2>SBOM差分（旧 → 新）</h2>
+          <div class="panel-meta">
+            <span id="diffFormats"></span>
+            <button id="diffCsvButton" type="button" class="secondary-button">差分CSV</button>
+            <button id="clearCompareButton" type="button" class="secondary-button">差分を閉じる</button>
+          </div>
+        </div>
+        <p id="diffSummary" class="diff-summary"></p>
+        <div class="table-wrap">
+          <table class="diff-table">
+            <thead>
+              <tr>
+                <th>名称</th>
+                <th>変更</th>
+                <th>バージョン（旧 → 新）</th>
+                <th>確認優先度（旧 → 新）</th>
+                <th>ライセンス（旧 → 新）</th>
+              </tr>
+            </thead>
+            <tbody id="diffRows"></tbody>
+          </table>
+        </div>
+        <div id="diffDependencies" class="diff-dependencies"></div>
       </section>
 
       <section class="workspace">
@@ -137,6 +191,7 @@
             <h2>コンポーネント一覧</h2>
             <div class="panel-meta">
               <span id="componentCount">0件表示</span>
+              <span id="reviewSummary" class="review-summary"></span>
               <span id="formatLabel">未読み込み</span>
             </div>
           </div>
@@ -150,6 +205,7 @@
                   <th><button class="sort-button" type="button" data-sort="category">用途</button></th>
                   <th><button class="sort-button" type="button" data-sort="license">ライセンス</button></th>
                   <th><button class="sort-button" type="button" data-sort="vulnerabilities">脆弱性</button></th>
+                  <th><button class="sort-button" type="button" data-sort="review">レビュー</button></th>
                 </tr>
               </thead>
               <tbody id="componentRows"></tbody>
@@ -174,7 +230,7 @@
 
     <template id="emptyRowTemplate">
       <tr>
-        <td colspan="6" class="empty-cell">SBOM JSONを読み込んでください。</td>
+        <td colspan="7" class="empty-cell">SBOM JSONを読み込んでください。</td>
       </tr>
     </template>
 
@@ -186,8 +242,12 @@
     <script src="./data/knowledge/review-priority-rules.js"></script>
     <script src="./data/knowledge-base.js"></script>
     <script src="./samples/sample-cyclonedx.js"></script>
+    <script src="./samples/sample-cyclonedx-prev.js"></script>
+    <script src="./samples/sample-spdx.js"></script>
     <script src="./js/review-priority.js"></script>
     <script src="./js/parser.js"></script>
+    <script src="./js/diff.js"></script>
+    <script src="./js/review.js"></script>
     <script src="./js/export.js"></script>
     <script src="./js/ui.js"></script>
     <script src="./app.js"></script>

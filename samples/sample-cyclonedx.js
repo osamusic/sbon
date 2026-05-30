@@ -9,6 +9,12 @@ window.SBON_SAMPLE_SBOM = {
       bomRef: "pkg:generic/openssl@1.1.1w",
       licenses: [{ license: { id: "Apache-2.0" } }],
       purl: "pkg:generic/openssl@1.1.1w",
+      supplier: { name: "OpenSSL Project" },
+      cpe: "cpe:2.3:a:openssl:openssl:1.1.1w:*:*:*:*:*:*:*",
+      externalReferences: [
+        { type: "website", url: "https://www.openssl.org/" },
+        { type: "vcs", url: "https://github.com/openssl/openssl" },
+      ],
     },
     {
       type: "library",

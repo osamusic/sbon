@@ -1,5 +1,5 @@
 (function () {
-  function createViewer({ parser, exporter, sampleSbom }) {
+  function createViewer({ parser, exporter, differ, review, sampleSbom, spdxSampleSbom, diffSampleSboms }) {
     const state = {
       format: "未読み込み",
       components: [],
@@ -7,14 +7,39 @@
       selectedId: null,
       sortKey: "priority",
       sortDirection: "asc",
+      compareFormat: "",
+      compareComponents: null,
+      compareDependencies: null,
+      reviews: review ? review.createReviewStore() : null,
     };
+
+    function reviewKey(component) {
+      if (differ && differ.componentKey) return differ.componentKey(component);
+      return component.id;
+    }
 
     const elements = {
       fileInput: document.querySelector("#fileInput"),
       dropzone: document.querySelector("#dropzone"),
+      loadStatus: document.querySelector("#loadStatus"),
       loadSampleButton: document.querySelector("#loadSampleButton"),
+      loadSpdxSampleButton: document.querySelector("#loadSpdxSampleButton"),
+      compareFileInput: document.querySelector("#compareFileInput"),
+      loadCompareButton: document.querySelector("#loadCompareButton"),
+      loadDiffSampleButton: document.querySelector("#loadDiffSampleButton"),
+      clearCompareButton: document.querySelector("#clearCompareButton"),
+      diffSection: document.querySelector("#diffSection"),
+      diffFormats: document.querySelector("#diffFormats"),
+      diffSummary: document.querySelector("#diffSummary"),
+      diffRows: document.querySelector("#diffRows"),
+      diffDependencies: document.querySelector("#diffDependencies"),
+      diffCsvButton: document.querySelector("#diffCsvButton"),
       printButton: document.querySelector("#printButton"),
       csvButton: document.querySelector("#csvButton"),
+      saveReviewButton: document.querySelector("#saveReviewButton"),
+      loadReviewButton: document.querySelector("#loadReviewButton"),
+      reviewFileInput: document.querySelector("#reviewFileInput"),
+      reviewSummary: document.querySelector("#reviewSummary"),
       searchInput: document.querySelector("#searchInput"),
       priorityFilter: document.querySelector("#priorityFilter"),
       categoryFilter: document.querySelector("#categoryFilter"),
@@ -28,6 +53,7 @@
       reportFormat: document.querySelector("#reportFormat"),
       reportSummary: document.querySelector("#reportSummary"),
       reportRows: document.querySelector("#reportRows"),
+      reportDetails: document.querySelector("#reportDetails"),
       componentRows: document.querySelector("#componentRows"),
       componentCount: document.querySelector("#componentCount"),
       emptyRowTemplate: document.querySelector("#emptyRowTemplate"),
@@ -65,9 +91,39 @@
         if (file) loadFile(file);
       });
 
-      elements.loadSampleButton.addEventListener("click", () => loadSbom(sampleSbom));
+      elements.loadSampleButton.addEventListener("click", () => loadSbom(sampleSbom, "CycloneDXサンプル"));
+      if (spdxSampleSbom) {
+        elements.loadSpdxSampleButton.addEventListener("click", () => loadSbom(spdxSampleSbom, "SPDXサンプル"));
+      }
+
+      elements.loadCompareButton.addEventListener("click", () => elements.compareFileInput.click());
+      elements.compareFileInput.addEventListener("change", (event) => {
+        const file = event.target.files?.[0];
+        if (file) loadCompareFile(file);
+      });
+      elements.clearCompareButton.addEventListener("click", clearCompare);
+      if (elements.diffCsvButton) {
+        elements.diffCsvButton.addEventListener("click", () => {
+          if (state.compareComponents) exporter.exportDiffCsv(computeDiff().entries);
+        });
+      }
+      if (diffSampleSboms) {
+        elements.loadDiffSampleButton.addEventListener("click", loadDiffSample);
+      }
       elements.printButton.addEventListener("click", () => window.print());
       elements.csvButton.addEventListener("click", () => exporter.exportCsv(state.components));
+      if (state.reviews && elements.saveReviewButton) {
+        elements.saveReviewButton.addEventListener("click", () => {
+          exporter.exportReviewJson(state.reviews.toJSON());
+        });
+      }
+      if (state.reviews && elements.loadReviewButton && elements.reviewFileInput) {
+        elements.loadReviewButton.addEventListener("click", () => elements.reviewFileInput.click());
+        elements.reviewFileInput.addEventListener("change", (event) => {
+          const file = event.target.files?.[0];
+          if (file) loadReviewFile(file);
+        });
+      }
       elements.searchInput.addEventListener("input", render);
       elements.priorityFilter.addEventListener("change", render);
       elements.categoryFilter.addEventListener("change", render);
@@ -89,20 +145,101 @@
     }
 
     async function loadFile(file) {
+      let json;
       try {
-        const json = JSON.parse(await file.text());
-        loadSbom(json);
+        json = JSON.parse(await file.text());
       } catch (error) {
-        alert(error.message || "JSONの読み込みに失敗しました。");
+        showLoadStatus(`「${file.name}」を読み込めませんでした。正しいJSONファイルか確認してください。`, "error");
+        return;
       }
+      loadSbom(json, file.name);
     }
 
-    function loadSbom(json) {
-      const normalized = parser.normalizeSbom(json);
+    function loadSbom(json, sourceName) {
+      let normalized;
+      try {
+        normalized = parser.normalizeSbom(json);
+      } catch (error) {
+        showLoadStatus(error.message || "SBOMの読み込みに失敗しました。", "error");
+        return;
+      }
+
       state.format = normalized.format;
       state.components = normalized.components;
       state.dependencies = normalized.dependencies;
       state.selectedId = state.components[0]?.id || null;
+      showLoadStatus(
+        `${sourceName ? `「${sourceName}」を` : ""}${normalized.format} として読み込みました。コンポーネント${normalized.components.length}件。`,
+        normalized.components.length === 0 ? "warning" : "success",
+      );
+      render();
+    }
+
+    function showLoadStatus(message, kind) {
+      const status = elements.loadStatus;
+      if (!status) return;
+      status.textContent = message;
+      status.hidden = false;
+      status.dataset.kind = kind;
+    }
+
+    async function loadCompareFile(file) {
+      let json;
+      try {
+        json = JSON.parse(await file.text());
+      } catch (error) {
+        showLoadStatus(`比較対象「${file.name}」を読み込めませんでした。正しいJSONか確認してください。`, "error");
+        return;
+      }
+      loadCompareSbom(json, file.name);
+    }
+
+    function loadCompareSbom(json, sourceName) {
+      let normalized;
+      try {
+        normalized = parser.normalizeSbom(json);
+      } catch (error) {
+        showLoadStatus(`比較対象の読み込みに失敗しました: ${error.message}`, "error");
+        return;
+      }
+
+      state.compareFormat = normalized.format;
+      state.compareComponents = normalized.components;
+      state.compareDependencies = normalized.dependencies;
+      showLoadStatus(
+        `${sourceName ? `「${sourceName}」を` : ""}比較対象（旧）として読み込みました。差分を下部に表示します。`,
+        "success",
+      );
+      render();
+    }
+
+    function loadDiffSample() {
+      loadSbom(diffSampleSboms.after, "CycloneDXサンプル（新）");
+      loadCompareSbom(diffSampleSboms.before, "CycloneDXサンプル（旧）");
+    }
+
+    async function loadReviewFile(file) {
+      let data;
+      try {
+        data = JSON.parse(await file.text());
+      } catch (error) {
+        showLoadStatus(`レビュー結果「${file.name}」を読み込めませんでした。正しいJSONか確認してください。`, "error");
+        return;
+      }
+      try {
+        state.reviews.loadJSON(data);
+      } catch (error) {
+        showLoadStatus(error.message || "レビュー結果の読み込みに失敗しました。", "error");
+        return;
+      }
+      showLoadStatus(`レビュー結果「${file.name}」を読み込みました。`, "success");
+      render();
+    }
+
+    function clearCompare() {
+      state.compareFormat = "";
+      state.compareComponents = null;
+      state.compareDependencies = null;
       render();
     }
 
@@ -113,8 +250,84 @@
       renderPrintReport();
       renderRows(sorted);
       renderListMeta(sorted.length);
-      renderDetail();
+      renderDetail(sorted);
       renderTree();
+      renderDiff();
+    }
+
+    function computeDiff() {
+      return differ.diffSboms(
+        { components: state.compareComponents, dependencies: state.compareDependencies },
+        { components: state.components, dependencies: state.dependencies },
+      );
+    }
+
+    function renderDiff() {
+      if (!elements.diffSection) return;
+
+      if (!differ || !state.compareComponents) {
+        elements.diffSection.hidden = true;
+        return;
+      }
+
+      const { entries, summary, dependencyChanges } = computeDiff();
+      const changes = entries.filter((entry) => entry.changeType !== "unchanged");
+
+      elements.diffSection.hidden = false;
+      elements.diffFormats.textContent = `旧: ${state.compareFormat} ／ 新: ${state.format}`;
+      elements.diffSummary.textContent = `追加${summary.added}件、削除${summary.removed}件、更新${summary.changed}件、確認優先度の上昇${summary.escalated}件（変更なし${summary.unchanged}件）。`;
+      elements.diffRows.textContent = "";
+
+      if (changes.length === 0) {
+        const row = document.createElement("tr");
+        row.innerHTML = '<td colspan="5" class="empty-cell">2つのSBOM間に変更されたコンポーネントはありません。</td>';
+        elements.diffRows.append(row);
+      } else {
+        for (const entry of changes) {
+          const row = document.createElement("tr");
+          row.className = entry.priorityEscalated ? "diff-escalated" : "";
+          row.innerHTML = `
+            <td><span class="pkg-name">${escapeHtml(entry.name)}</span></td>
+            <td>${diffChangeBadge(entry)}</td>
+            <td>${escapeHtml(diffVersionText(entry))}</td>
+            <td>${diffPriorityText(entry)}</td>
+            <td>${diffLicenseText(entry)}</td>
+          `;
+          elements.diffRows.append(row);
+        }
+      }
+
+      renderDependencyDiff(dependencyChanges);
+    }
+
+    function renderDependencyDiff(dependencyChanges) {
+      if (!elements.diffDependencies) return;
+
+      const changes = dependencyChanges || { added: [], removed: [] };
+      if (!changes.added.length && !changes.removed.length) {
+        elements.diffDependencies.innerHTML =
+          '<p class="diff-dep-empty">依存関係（依存先）の追加・削除は検出されませんでした。</p>';
+        return;
+      }
+
+      const section = (title, edges, kind) =>
+        edges.length
+          ? `<div class="diff-dep-group">
+              <p class="diff-dep-title">${title}（${edges.length}件）</p>
+              <ul class="plain-list">${edges
+                .map(
+                  (edge) =>
+                    `<li><span class="diff-badge ${kind}">${kind === "added" ? "追加" : "削除"}</span> ${escapeHtml(edge.from)} → ${escapeHtml(edge.to)}</li>`,
+                )
+                .join("")}</ul>
+            </div>`
+          : "";
+
+      elements.diffDependencies.innerHTML = `
+        <h3 class="diff-dep-heading">依存関係の差分</h3>
+        ${section("追加された依存", changes.added, "added")}
+        ${section("削除された依存", changes.removed, "removed")}
+      `;
     }
 
     function renderSummary() {
@@ -166,6 +379,7 @@
         const row = document.createElement("tr");
         row.innerHTML = '<td colspan="5" class="empty-cell">印刷対象の最優先確認・要確認コンポーネントはありません。</td>';
         elements.reportRows.append(row);
+        renderReportDetails([]);
         return;
       }
 
@@ -180,6 +394,57 @@
         `;
         elements.reportRows.append(row);
       }
+
+      renderReportDetails(rows);
+    }
+
+    function renderReportDetails(rows) {
+      if (!elements.reportDetails) return;
+
+      if (rows.length === 0) {
+        elements.reportDetails.innerHTML =
+          '<p class="empty">詳細確認が必要なコンポーネントはありません。</p>';
+        return;
+      }
+
+      elements.reportDetails.innerHTML = rows
+        .map((component) => {
+          const provenance = [component.supplier, component.publisher].filter(Boolean).join(" / ") || "未記載";
+          const identifier = component.purl || component.cpe || component.id;
+          const findings = component.findings.length
+            ? `<ul class="plain-list">${component.findings.map((finding) => `<li>${escapeHtml(finding)}</li>`).join("")}</ul>`
+            : "<p>主要な確認事項は検出されていません。</p>";
+          const vulnerabilities = component.vulnerabilities.length
+            ? `<ul class="plain-list">${component.vulnerabilities
+                .map((item) => `<li>${escapeHtml(`${item.id} (${severityLabel(item.severity)}${item.score ? `, CVSS ${item.score}` : ""})`)}</li>`)
+                .join("")}</ul>`
+            : "<p>SBOM内に既知の脆弱性の記載はありません。</p>";
+          const reviewEntry = state.reviews ? state.reviews.get(reviewKey(component)) : null;
+          const reviewBlock =
+            reviewEntry && (reviewEntry.status !== "unreviewed" || reviewEntry.note)
+              ? `<p class="report-detail-label">レビュー状況</p>
+                 <p>${escapeHtml(reviewStatusLabel(reviewEntry.status))}${reviewEntry.note ? ` ／ ${escapeHtml(reviewEntry.note)}` : ""}</p>`
+              : "";
+
+          return `
+            <article class="report-detail">
+              <div class="report-detail-head">
+                <h4>${escapeHtml(component.name)} ${escapeHtml(component.version)}</h4>
+                <span class="badge ${component.reviewPriority}">${reviewPriorityLabel(component.reviewPriority)}</span>
+              </div>
+              <p class="report-detail-meta">${escapeHtml(component.categoryLabel)} ／ ${escapeHtml(identifier)}</p>
+              <p>${escapeHtml(component.explanation)}</p>
+              <p class="report-detail-label">確認ポイント</p>
+              ${findings}
+              <p class="report-detail-label">提供元 / ライセンス</p>
+              <p>${escapeHtml(provenance)} ／ ${escapeHtml(component.licenses.join(", ") || "未確認")}</p>
+              ${reviewBlock}
+              <p class="report-detail-label">脆弱性</p>
+              ${vulnerabilities}
+            </article>
+          `;
+        })
+        .join("");
     }
 
     function renderRows(components) {
@@ -201,6 +466,7 @@
           <td class="category">${escapeHtml(component.categoryLabel)}</td>
           <td>${escapeHtml(component.licenses.join(", ") || "未確認")}</td>
           <td>${component.vulnerabilities.length}</td>
+          <td>${reviewStatusBadge(reviewStatusOf(component))}</td>
         `;
         row.addEventListener("click", () => selectComponent(component.id));
         row.addEventListener("keydown", (event) => {
@@ -215,6 +481,7 @@
 
     function renderListMeta(visibleCount) {
       elements.componentCount.textContent = `${visibleCount} / ${state.components.length}件表示`;
+      renderReviewSummary();
       for (const button of elements.sortButtons) {
         const active = button.dataset.sort === state.sortKey;
         button.classList.toggle("is-active", active);
@@ -222,14 +489,37 @@
       }
     }
 
-    function renderDetail() {
+    function renderReviewSummary() {
+      if (!elements.reviewSummary) return;
+      if (!state.reviews || state.reviews.size() === 0) {
+        elements.reviewSummary.textContent = "";
+        return;
+      }
+      const summary = state.reviews.summary();
+      const parts = [];
+      if (summary["action-required"]) parts.push(`要対応${summary["action-required"]}`);
+      if (summary.approved) parts.push(`承認${summary.approved}`);
+      if (summary["in-progress"]) parts.push(`確認中${summary["in-progress"]}`);
+      elements.reviewSummary.textContent = parts.length ? `レビュー: ${parts.join(" / ")}` : "";
+    }
+
+    function renderDetail(visibleComponents = state.components) {
       const component = state.components.find((item) => item.id === state.selectedId);
       if (!component) {
-        elements.detailView.innerHTML = '<p class="empty">一覧からコンポーネントを選択してください。</p>';
+        const message = state.components.length
+          ? "一覧からコンポーネントを選択してください。"
+          : "SBOMを読み込むと、コンポーネントの詳細を表示します。";
+        elements.detailView.innerHTML = `<p class="empty">${message}</p>`;
         return;
       }
 
+      const isFilteredOut = !visibleComponents.some((item) => item.id === component.id);
+      const filteredNotice = isFilteredOut
+        ? '<p class="filtered-notice">この項目は現在の絞り込み条件では一覧に表示されていません。</p>'
+        : "";
+
       elements.detailView.innerHTML = `
+        ${filteredNotice}
         <div class="detail-title">
           <div>
             <h3>${escapeHtml(component.name)}</h3>
@@ -245,10 +535,12 @@
           <h4>確認ポイント</h4>
           ${renderList(component.findings.length ? component.findings : ["現時点で主要な確認事項は検出されていません。"])}
         </div>
+        ${renderReviewSection(component)}
         <div class="detail-section">
           <h4>知識ベース照合</h4>
           <p>${escapeHtml(matchSummary(component))}</p>
         </div>
+        ${renderSupplierSection(component)}
         <div class="detail-section">
           <h4>ライセンス</h4>
           <p>${escapeHtml(component.licenses.join(", ") || "未確認")}</p>
@@ -258,6 +550,51 @@
           ${renderVulnerabilities(component.vulnerabilities)}
         </div>
       `;
+
+      bindReviewControls(component);
+    }
+
+    function renderReviewSection(component) {
+      if (!state.reviews) return "";
+      const entry = state.reviews.get(reviewKey(component));
+      const options = review.STATUSES.map(
+        (status) =>
+          `<option value="${status}"${status === entry.status ? " selected" : ""}>${escapeHtml(review.statusLabel(status))}</option>`,
+      ).join("");
+      return `
+        <div class="detail-section review-edit">
+          <h4>レビュー</h4>
+          <div class="review-controls">
+            <label class="review-field">
+              <span>確認ステータス</span>
+              <select id="reviewStatusSelect" class="review-status-select">${options}</select>
+            </label>
+            <label class="review-field">
+              <span>確認メモ</span>
+              <textarea id="reviewNoteInput" class="review-note-input" rows="3" placeholder="確認した内容や指摘事項を記録できます。">${escapeHtml(entry.note)}</textarea>
+            </label>
+          </div>
+        </div>
+      `;
+    }
+
+    function bindReviewControls(component) {
+      if (!state.reviews) return;
+      const key = reviewKey(component);
+      const select = document.querySelector("#reviewStatusSelect");
+      if (select) {
+        select.addEventListener("change", () => {
+          state.reviews.setStatus(key, select.value);
+          render();
+        });
+      }
+      const note = document.querySelector("#reviewNoteInput");
+      if (note) {
+        // メモ入力中は詳細を作り直さない（フォーカスを失わないため）。状態のみ更新する。
+        note.addEventListener("input", () => {
+          state.reviews.setNote(key, note.value);
+        });
+      }
     }
 
     function renderTree() {
@@ -353,6 +690,9 @@
       if (sortKey === "version") {
         return String(a.version).localeCompare(String(b.version), "ja", { numeric: true });
       }
+      if (sortKey === "review") {
+        return reviewStatusRank(reviewStatusOf(a)) - reviewStatusRank(reviewStatusOf(b));
+      }
       return a.name.localeCompare(b.name);
     }
 
@@ -377,6 +717,11 @@
       return component.licenses.join(", ") || "未確認";
     }
 
+    function reviewStatusOf(component) {
+      if (!state.reviews) return "unreviewed";
+      return state.reviews.get(reviewKey(component)).status;
+    }
+
     function selectComponent(id) {
       state.selectedId = id;
       render();
@@ -399,6 +744,84 @@
 
   function severityLabel(severity) {
     return { critical: "緊急", high: "高", medium: "中", low: "低", unknown: "不明" }[severity] || "不明";
+  }
+
+  function reviewStatusLabel(status) {
+    return window.SBON_REVIEW ? window.SBON_REVIEW.statusLabel(status) : status;
+  }
+
+  function reviewStatusBadge(status) {
+    return `<span class="review-badge ${status}">${escapeHtml(reviewStatusLabel(status))}</span>`;
+  }
+
+  function reviewStatusRank(status) {
+    return { "action-required": 0, "in-progress": 1, unreviewed: 2, approved: 3 }[status] ?? 9;
+  }
+
+  function diffChangeBadge(entry) {
+    const labels = { added: "追加", removed: "削除", changed: "更新", unchanged: "変更なし" };
+    const escalation = entry.priorityEscalated ? ' <span class="diff-escalation-mark">優先度上昇</span>' : "";
+    return `<span class="diff-badge ${entry.changeType}">${labels[entry.changeType] || entry.changeType}</span>${escalation}`;
+  }
+
+  function diffVersionText(entry) {
+    const before = entry.before ? entry.before.version : "—";
+    const after = entry.after ? entry.after.version : "—";
+    if (entry.changeType === "added") return `（新規） ${after}`;
+    if (entry.changeType === "removed") return `${before} （削除）`;
+    return `${before} → ${after}`;
+  }
+
+  function diffPriorityText(entry) {
+    const before = entry.before ? reviewPriorityLabel(entry.before.reviewPriority) : "—";
+    const after = entry.after ? reviewPriorityLabel(entry.after.reviewPriority) : "—";
+    return `${escapeHtml(before)} → ${escapeHtml(after)}`;
+  }
+
+  function diffLicenseText(entry) {
+    const before = licenseSnapshotText(entry.before);
+    const after = licenseSnapshotText(entry.after);
+    const text = before === after ? escapeHtml(after) : `${escapeHtml(before)} → ${escapeHtml(after)}`;
+    return entry.licenseChanged ? `<span class="diff-license-changed">${text}</span>` : text;
+  }
+
+  function licenseSnapshotText(snapshot) {
+    if (!snapshot) return "—";
+    return (snapshot.licenses || []).join(", ") || "未確認";
+  }
+
+  function renderSupplierSection(component) {
+    const rows = [
+      ["提供元", component.supplier],
+      ["発行元", component.publisher],
+      ["CPE", component.cpe],
+      ["著作権表示", component.copyright],
+      ["SBOM内の説明", component.description],
+    ].filter(([, value]) => value);
+
+    const references = (component.references || []).filter((reference) => reference.url);
+    if (references.length) {
+      const links = references
+        .map(
+          (reference) =>
+            `<a href="${escapeHtml(reference.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(reference.type)}</a>`,
+        )
+        .join("、");
+      rows.push(["参照リンク", links, true]);
+    }
+
+    const body = rows.length
+      ? `<dl class="detail-meta">${rows
+          .map(([label, value, isHtml]) => `<div><dt>${label}</dt><dd>${isHtml ? value : escapeHtml(value)}</dd></div>`)
+          .join("")}</dl>`
+      : "<p>提供元・識別子情報はSBOMに記載されていません。</p>";
+
+    return `
+      <div class="detail-section">
+        <h4>提供元・識別子</h4>
+        ${body}
+      </div>
+    `;
   }
 
   function matchSummary(component) {

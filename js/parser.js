@@ -1,14 +1,20 @@
 (function () {
   function normalizeSbom(sbom) {
-    if (Array.isArray(sbom.components) || sbom.bomFormat === "CycloneDX") {
+    if (sbom === null || typeof sbom !== "object" || Array.isArray(sbom)) {
+      throw new Error("SBOMはJSONオブジェクトである必要があります。配列や数値などは読み込めません。");
+    }
+
+    if (sbom.bomFormat === "CycloneDX" || sbom.specVersion || Array.isArray(sbom.components)) {
       return normalizeCycloneDx(sbom);
     }
 
-    if (Array.isArray(sbom.packages) || sbom.spdxVersion) {
+    if (sbom.spdxVersion || Array.isArray(sbom.packages) || sbom.SPDXID) {
       return normalizeSpdx(sbom);
     }
 
-    throw new Error("CycloneDX JSON または SPDX JSON として認識できません。");
+    throw new Error(
+      "CycloneDX JSON または SPDX JSON として認識できません。CycloneDXは bomFormat / specVersion / components、SPDXは spdxVersion / packages を含む必要があります。",
+    );
   }
 
   function normalizeCycloneDx(sbom) {
@@ -22,6 +28,12 @@
         type: component.type || "不明",
         licenses: parseCycloneDxLicenses(component.licenses),
         purl: component.purl || id,
+        cpe: component.cpe || "",
+        supplier: component.supplier?.name || "",
+        publisher: component.publisher || component.author || "",
+        copyright: component.copyright || "",
+        description: component.description || "",
+        references: parseCycloneDxReferences(component.externalReferences),
         vulnerabilities: vulnerabilities.get(id) || vulnerabilities.get(component.purl) || [],
       });
     });
@@ -62,7 +74,13 @@
         version: pkg.versionInfo || "不明",
         type: "package",
         licenses: parseSpdxLicense(pkg),
-        purl: (pkg.externalRefs || []).find((ref) => ref.referenceType === "purl")?.referenceLocator || "",
+        purl: findSpdxExternalRef(pkg, "purl") || "",
+        cpe: findSpdxExternalRef(pkg, "cpe23Type") || findSpdxExternalRef(pkg, "cpe22Type") || "",
+        supplier: cleanSpdxActor(pkg.supplier),
+        publisher: cleanSpdxActor(pkg.originator),
+        copyright: pkg.copyrightText && pkg.copyrightText !== "NOASSERTION" ? pkg.copyrightText : "",
+        description: pkg.description || pkg.summary || "",
+        references: parseSpdxReferences(pkg),
         vulnerabilities: [],
       }),
     );
@@ -111,6 +129,36 @@
   function parseSpdxLicense(pkg) {
     const license = pkg.licenseConcluded || pkg.licenseDeclared;
     return license ? [license] : [];
+  }
+
+  function parseCycloneDxReferences(references = []) {
+    return (references || [])
+      .map((reference) => ({
+        type: reference.type || "other",
+        url: reference.url || "",
+      }))
+      .filter((reference) => reference.url);
+  }
+
+  function parseSpdxReferences(pkg) {
+    const references = [];
+    if (pkg.homepage && pkg.homepage !== "NOASSERTION") {
+      references.push({ type: "website", url: pkg.homepage });
+    }
+    if (pkg.downloadLocation && pkg.downloadLocation !== "NOASSERTION" && pkg.downloadLocation !== "NONE") {
+      references.push({ type: "distribution", url: pkg.downloadLocation });
+    }
+    return references;
+  }
+
+  function findSpdxExternalRef(pkg, referenceType) {
+    return (pkg.externalRefs || []).find((ref) => ref.referenceType === referenceType)?.referenceLocator || "";
+  }
+
+  function cleanSpdxActor(value) {
+    if (!value || value === "NOASSERTION") return "";
+    // SPDXの supplier / originator は "Organization: Foo" や "Person: Bar" の形式が多い。
+    return String(value).replace(/^(Organization|Person|Tool):\s*/i, "");
   }
 
   window.SBON_PARSER = {
