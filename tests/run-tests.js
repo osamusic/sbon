@@ -299,6 +299,15 @@ function testDiffLogic() {
   // 依存関係の差分: 旧サンプルは依存定義なし → 新サンプルの全エッジが「追加」。
   assert.strictEqual(dependencyChanges.added.length, 4, "新たな依存エッジ4件");
   assert.strictEqual(dependencyChanges.removed.length, 0);
+
+  // リリースレビュー向け要約。
+  const release = window.SBON_DIFF.buildReleaseSummary({ entries, summary, dependencyChanges });
+  assert.ok(release.headline.includes("追加1件・削除1件・更新2件"));
+  const high = release.points.filter((p) => p.level === "high");
+  assert.ok(high.some((p) => p.text.includes("確認優先度が上がった") && p.text.includes("openssl")));
+  assert.ok(release.points.some((p) => p.text.includes("新規に追加") && p.text.includes("linux-kernel")));
+  assert.ok(release.points.some((p) => p.text.includes("削除された") && p.text.includes("curl")));
+  assert.ok(release.points.some((p) => p.text.includes("依存関係の変化")));
 }
 
 function testDiffLicenseAndCsv() {
@@ -431,6 +440,8 @@ function testUiInteractions() {
   assert.strictEqual(get("#diffSection").hidden, false);
   assert.ok(get("#diffSummary").textContent.includes("確認優先度の上昇1件"));
   assert.ok(get("#diffDependencies").innerHTML.includes("依存関係の差分"));
+  assert.ok(get("#diffReleaseSummary").innerHTML.includes("リリースレビュー向け要約"));
+  assert.ok(get("#diffReleaseSummary").innerHTML.includes("確認優先度が上がった"));
 
   // 差分CSV出力ボタンが例外なく動作する。
   events.get("#diffCsvButton:click")();

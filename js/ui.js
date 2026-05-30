@@ -33,6 +33,7 @@
       diffSection: document.querySelector("#diffSection"),
       diffFormats: document.querySelector("#diffFormats"),
       diffSummary: document.querySelector("#diffSummary"),
+      diffReleaseSummary: document.querySelector("#diffReleaseSummary"),
       diffRows: document.querySelector("#diffRows"),
       diffDependencies: document.querySelector("#diffDependencies"),
       diffCsvButton: document.querySelector("#diffCsvButton"),
@@ -278,12 +279,14 @@
         return;
       }
 
-      const { entries, summary, dependencyChanges } = computeDiff();
+      const diff = computeDiff();
+      const { entries, summary, dependencyChanges } = diff;
       const changes = entries.filter((entry) => entry.changeType !== "unchanged");
 
       elements.diffSection.hidden = false;
       elements.diffFormats.textContent = `旧: ${state.compareFormat} ／ 新: ${state.format}`;
       elements.diffSummary.textContent = `追加${summary.added}件、削除${summary.removed}件、更新${summary.changed}件、確認優先度の上昇${summary.escalated}件（変更なし${summary.unchanged}件）。`;
+      renderReleaseSummary(diff);
       elements.diffRows.textContent = "";
 
       if (changes.length === 0) {
@@ -306,6 +309,27 @@
       }
 
       renderDependencyDiff(dependencyChanges);
+    }
+
+    function renderReleaseSummary(diff) {
+      if (!elements.diffReleaseSummary) return;
+      if (!differ.buildReleaseSummary) {
+        elements.diffReleaseSummary.innerHTML = "";
+        return;
+      }
+
+      const { headline, points } = differ.buildReleaseSummary(diff);
+      const items = points
+        .map(
+          (point) =>
+            `<li class="release-point ${point.level}">${escapeHtml(point.text)}</li>`,
+        )
+        .join("");
+      elements.diffReleaseSummary.innerHTML = `
+        <h3 class="release-summary-title">リリースレビュー向け要約</h3>
+        <p class="release-headline">${escapeHtml(headline)}</p>
+        <ul class="release-points">${items}</ul>
+      `;
     }
 
     function renderDependencyDiff(dependencyChanges) {

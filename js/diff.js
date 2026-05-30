@@ -164,8 +164,92 @@
     return String(a.from).localeCompare(String(b.from), "ja") || String(a.to).localeCompare(String(b.to), "ja");
   }
 
+  const PRIORITY_LABELS = { high: "高", medium: "中", low: "低" };
+
+  // diffSboms の結果から、リリースレビュー向けの日本語要約を生成する。
+  // 返り値: { headline, points: [{ level: "high"|"info", text }] }
+  function buildReleaseSummary(diff) {
+    const entries = diff?.entries || [];
+    const summary = diff?.summary || { added: 0, removed: 0, changed: 0, unchanged: 0 };
+    const dependencyChanges = diff?.dependencyChanges || { added: [], removed: [] };
+
+    const headline = `前回SBOMと比べて、追加${summary.added}件・削除${summary.removed}件・更新${summary.changed}件の変更があります（変更なし${summary.unchanged}件）。`;
+    const points = [];
+
+    const escalated = entries.filter((entry) => entry.priorityEscalated);
+    if (escalated.length) {
+      const names = nameList(
+        escalated.map(
+          (entry) =>
+            `${entry.name}（${priorityLabel(entry.before?.reviewPriority)}→${priorityLabel(entry.after?.reviewPriority)}）`,
+        ),
+      );
+      points.push({
+        level: "high",
+        text: `確認優先度が上がった項目が${escalated.length}件あります: ${names}。優先的に確認してください。`,
+      });
+    }
+
+    const licenseChanged = entries.filter((entry) => entry.licenseChanged);
+    if (licenseChanged.length) {
+      points.push({
+        level: "high",
+        text: `ライセンスが変更された項目が${licenseChanged.length}件あります: ${nameList(licenseChanged.map((entry) => entry.name))}。利用条件を再確認してください。`,
+      });
+    }
+
+    const added = entries.filter((entry) => entry.changeType === "added");
+    if (added.length) {
+      points.push({
+        level: "info",
+        text: `新規に追加されたコンポーネントが${added.length}件あります: ${nameList(added.map((entry) => `${entry.name} ${entry.after?.version || ""}`.trim()))}。用途と来歴を確認してください。`,
+      });
+    }
+
+    const removed = entries.filter((entry) => entry.changeType === "removed");
+    if (removed.length) {
+      points.push({
+        level: "info",
+        text: `削除されたコンポーネントが${removed.length}件あります: ${nameList(removed.map((entry) => `${entry.name} ${entry.before?.version || ""}`.trim()))}。依存先への影響を確認してください。`,
+      });
+    }
+
+    const versionUpdated = entries.filter(
+      (entry) => entry.changeType === "changed" && !entry.priorityEscalated && !entry.licenseChanged,
+    );
+    if (versionUpdated.length) {
+      points.push({
+        level: "info",
+        text: `バージョンが更新された項目が${versionUpdated.length}件あります: ${nameList(versionUpdated.map((entry) => entry.name))}。`,
+      });
+    }
+
+    if (dependencyChanges.added.length || dependencyChanges.removed.length) {
+      points.push({
+        level: "info",
+        text: `依存関係の変化があります（依存先の追加${dependencyChanges.added.length}件 / 削除${dependencyChanges.removed.length}件）。`,
+      });
+    }
+
+    if (!points.length) {
+      points.push({ level: "info", text: "確認が必要な大きな変更は検出されませんでした。" });
+    }
+
+    return { headline, points };
+  }
+
+  function priorityLabel(reviewPriority) {
+    return PRIORITY_LABELS[reviewPriority] || "不明";
+  }
+
+  function nameList(names, max = 5) {
+    if (names.length <= max) return names.join("、");
+    return `${names.slice(0, max).join("、")} ほか${names.length - max}件`;
+  }
+
   window.SBON_DIFF = {
     diffSboms,
     componentKey,
+    buildReleaseSummary,
   };
 })();
