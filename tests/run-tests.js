@@ -399,6 +399,11 @@ function testUiInteractions() {
   events.get("#loadSampleButton:click")();
   assert.strictEqual(get("#componentCount").textContent, "4 / 4件表示");
 
+  // 目立つCTA「サンプルSBOMで試す」も同じサンプルを読み込む。
+  events.get("#trySampleButton:click")();
+  assert.strictEqual(get("#componentCount").textContent, "4 / 4件表示");
+  assert.ok(get("#loadStatus").textContent.includes("CycloneDX"));
+
   // レビュー: 選択中コンポーネントのステータスを変更すると一覧の要約に反映される。
   const reviewSelect = get("#reviewStatusSelect");
   reviewSelect.value = "approved";

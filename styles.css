@@ -272,6 +272,43 @@ main {
   font-weight: 700;
 }
 
+.hero-cta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 16px;
+}
+
+.cta-button {
+  min-height: 48px;
+  padding: 0 22px;
+  font-size: 16px;
+  font-weight: 800;
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(20, 108, 148, 0.28);
+}
+
+.cta-link {
+  min-height: 48px;
+  border: none;
+  background: none;
+  color: var(--accent);
+  text-decoration: underline;
+  padding: 0 4px;
+  font-weight: 700;
+}
+
+.cta-link:hover {
+  background: none;
+  color: var(--accent-dark);
+}
+
+.hero-cta-sub {
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .input-hero {
   flex-shrink: 0;
   width: clamp(150px, 20vw, 220px);

@@ -24,6 +24,8 @@
       loadStatus: document.querySelector("#loadStatus"),
       loadSampleButton: document.querySelector("#loadSampleButton"),
       loadSpdxSampleButton: document.querySelector("#loadSpdxSampleButton"),
+      trySampleButton: document.querySelector("#trySampleButton"),
+      trySpdxSampleButton: document.querySelector("#trySpdxSampleButton"),
       compareFileInput: document.querySelector("#compareFileInput"),
       loadCompareButton: document.querySelector("#loadCompareButton"),
       loadDiffSampleButton: document.querySelector("#loadDiffSampleButton"),
@@ -92,8 +94,14 @@
       });
 
       elements.loadSampleButton.addEventListener("click", () => loadSbom(sampleSbom, "CycloneDXサンプル"));
+      if (elements.trySampleButton) {
+        elements.trySampleButton.addEventListener("click", () => loadSbom(sampleSbom, "CycloneDXサンプル"));
+      }
       if (spdxSampleSbom) {
         elements.loadSpdxSampleButton.addEventListener("click", () => loadSbom(spdxSampleSbom, "SPDXサンプル"));
+        if (elements.trySpdxSampleButton) {
+          elements.trySpdxSampleButton.addEventListener("click", () => loadSbom(spdxSampleSbom, "SPDXサンプル"));
+        }
       }
 
       elements.loadCompareButton.addEventListener("click", () => elements.compareFileInput.click());
