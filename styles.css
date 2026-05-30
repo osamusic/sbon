@@ -689,6 +689,32 @@ main {
   display: none;
 }
 
+.print-report[data-scope="procurement"] .report-technical {
+  display: none;
+}
+
+.print-report[data-scope="technical"] .report-procurement {
+  display: none;
+}
+
+.report-scope-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.report-scope-field select {
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 8px;
+  background: #fff;
+  color: var(--ink);
+}
+
 .report-head {
   display: flex;
   justify-content: space-between;

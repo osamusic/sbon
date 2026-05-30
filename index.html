@@ -46,6 +46,14 @@
           <span aria-hidden="true">◎</span>
           SPDX例
         </button>
+        <label class="report-scope-field" title="PDFに含める範囲">
+          <span>出力範囲</span>
+          <select id="reportScope">
+            <option value="both">調達＋技術</option>
+            <option value="procurement">調達向け概要</option>
+            <option value="technical">技術向け詳細</option>
+          </select>
+        </label>
         <button id="printButton" type="button" title="PDFとして保存">
           <span aria-hidden="true">□</span>
           PDF
@@ -136,7 +144,7 @@
         </article>
       </section>
 
-      <section class="print-report" aria-label="印刷用レポート">
+      <section id="printReport" class="print-report" data-scope="both" aria-label="印刷用レポート">
         <div class="report-head">
           <div>
             <p class="eyebrow">SBOM Review Report</p>
@@ -154,23 +162,27 @@
           </dl>
         </div>
         <p id="reportSummary">SBOMを読み込むと、印刷用の要約を表示します。</p>
-        <h3 class="report-section-title">経営・調達向け要約</h3>
-        <div class="report-table-wrap">
-          <table class="report-table">
-            <thead>
-              <tr>
-                <th>名称</th>
-                <th>バージョン</th>
-                <th>確認優先度</th>
-                <th>用途</th>
-                <th>主な確認ポイント</th>
-              </tr>
-            </thead>
-            <tbody id="reportRows"></tbody>
-          </table>
-        </div>
-        <h3 class="report-section-title">技術確認向け詳細</h3>
-        <div id="reportDetails" class="report-details"></div>
+        <section class="report-block report-procurement">
+          <h3 class="report-section-title">経営・調達向け要約</h3>
+          <div class="report-table-wrap">
+            <table class="report-table">
+              <thead>
+                <tr>
+                  <th>名称</th>
+                  <th>バージョン</th>
+                  <th>確認優先度</th>
+                  <th>用途</th>
+                  <th>主な確認ポイント</th>
+                </tr>
+              </thead>
+              <tbody id="reportRows"></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="report-block report-technical">
+          <h3 class="report-section-title">技術確認向け詳細</h3>
+          <div id="reportDetails" class="report-details"></div>
+        </section>
         <p class="report-copyright">© 2026 osamusic. SBON（トライアル版）で出力。確認の参考情報です。</p>
       </section>
 

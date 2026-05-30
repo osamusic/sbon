@@ -76,6 +76,8 @@
       diffCsvButton: document.querySelector("#diffCsvButton"),
       printButton: document.querySelector("#printButton"),
       csvButton: document.querySelector("#csvButton"),
+      reportScope: document.querySelector("#reportScope"),
+      printReport: document.querySelector("#printReport"),
       saveReviewButton: document.querySelector("#saveReviewButton"),
       loadReviewButton: document.querySelector("#loadReviewButton"),
       reviewFileInput: document.querySelector("#reviewFileInput"),
@@ -108,7 +110,13 @@
     function start() {
       restoreReviews();
       bindEvents();
+      applyReportScope();
       render();
+    }
+
+    function applyReportScope() {
+      if (!elements.printReport || !elements.reportScope) return;
+      elements.printReport.dataset.scope = elements.reportScope.value || "both";
     }
 
     function bindEvents() {
@@ -159,6 +167,9 @@
         elements.loadDiffSampleButton.addEventListener("click", loadDiffSample);
       }
       elements.printButton.addEventListener("click", () => window.print());
+      if (elements.reportScope) {
+        elements.reportScope.addEventListener("change", applyReportScope);
+      }
       elements.csvButton.addEventListener("click", () => exporter.exportCsv(state.components));
       if (state.reviews && elements.saveReviewButton) {
         elements.saveReviewButton.addEventListener("click", () => {

@@ -467,6 +467,14 @@ function testUiInteractions() {
   assert.ok(get("#loadStatus").textContent.includes("SPDX-2.3"));
   assert.strictEqual(get("#loadStatus").hidden, false);
 
+  // 出力範囲の切替: 印刷レポートの data-scope を選択値に同期する。
+  get("#reportScope").value = "procurement";
+  events.get("#reportScope:change")();
+  assert.strictEqual(get("#printReport").dataset.scope, "procurement");
+  get("#reportScope").value = "technical";
+  events.get("#reportScope:change")();
+  assert.strictEqual(get("#printReport").dataset.scope, "technical");
+
   events.get("#loadDiffSampleButton:click")();
   assert.strictEqual(get("#diffSection").hidden, false);
   assert.ok(get("#diffSummary").textContent.includes("確認優先度の上昇1件"));
