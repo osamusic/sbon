@@ -61,7 +61,7 @@ SBONは、非エンジニアのSBOM利用者向けに、CycloneDX JSON / SPDX JS
 - `knowledge-base-design.md` のモデルに沿って、説明、識別子、カテゴリ、確認優先度ルールを分離する
 - OpenSSL、BusyBox、glibc、Linux kernelの4件だけを新形式へ移す
 - 各コンポーネントに「何に使われるか」「なぜ重要か」「確認すべきこと」「根拠」を持たせる
-- curl、nginx、Apache HTTP Server、OpenSSH、zlib、SQLite、Python、Node.jsなどは、スキーマと照合ロジックが固まってから追加する
+- curl、nginx、Apache HTTP Server、OpenSSH、zlib、SQLite、Python、Node.jsなどの拡充は、コア技術として別リポジトリでスクリプト管理する（この公開リポジトリの `data/knowledge/` はシード/サンプルとして扱い、手作業では拡充しない）
 
 ### 4. レポート品質の改善: 初期完了
 
