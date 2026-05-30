@@ -99,6 +99,35 @@ select:focus-visible,
   box-shadow: 0 2px 8px rgba(20, 108, 148, 0.15);
 }
 
+.site-footer {
+  margin-top: 32px;
+  padding: 24px clamp(16px, 4vw, 40px);
+  border-top: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--muted);
+}
+
+.site-footer-copyright {
+  margin: 0 0 6px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.site-footer-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.7;
+  max-width: 760px;
+}
+
+.report-copyright {
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .trial-tag {
   display: inline-block;
   vertical-align: middle;
@@ -981,6 +1010,7 @@ tbody tr.is-selected {
   .topbar,
   .hero-banner,
   .trial-notice,
+  .site-footer,
   .input-band,
   .filters,
   .component-panel,
