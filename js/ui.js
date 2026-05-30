@@ -14,6 +14,7 @@
     };
 
     const REVIEW_STORAGE_KEY = "sbon.reviews.v1";
+    const MAX_RENDERED_ROWS = 500;
 
     function reviewStorage() {
       try {
@@ -83,6 +84,7 @@
       reviewFileInput: document.querySelector("#reviewFileInput"),
       reviewSummary: document.querySelector("#reviewSummary"),
       reviewAlert: document.querySelector("#reviewAlert"),
+      listLimitNotice: document.querySelector("#listLimitNotice"),
       searchInput: document.querySelector("#searchInput"),
       priorityFilter: document.querySelector("#priorityFilter"),
       categoryFilter: document.querySelector("#categoryFilter"),
@@ -552,13 +554,18 @@
 
     function renderRows(components) {
       elements.componentRows.textContent = "";
+      updateListLimitNotice(components.length);
 
       if (components.length === 0) {
         elements.componentRows.append(elements.emptyRowTemplate.content.cloneNode(true));
         return;
       }
 
-      for (const component of components) {
+      // 巨大なSBOMでも一覧描画を軽く保つため、表示行数に上限を設ける。
+      // CSV・PDF・要約・詳細は全件を対象にしたままにする。
+      const visible = components.length > MAX_RENDERED_ROWS ? components.slice(0, MAX_RENDERED_ROWS) : components;
+
+      for (const component of visible) {
         const row = document.createElement("tr");
         row.className = component.id === state.selectedId ? "is-selected" : "";
         row.tabIndex = 0;
@@ -579,6 +586,17 @@
           }
         });
         elements.componentRows.append(row);
+      }
+    }
+
+    function updateListLimitNotice(total) {
+      if (!elements.listLimitNotice) return;
+      if (total > MAX_RENDERED_ROWS) {
+        elements.listLimitNotice.hidden = false;
+        elements.listLimitNotice.textContent = `件数が多いため、一覧は先頭${MAX_RENDERED_ROWS}件のみ表示しています（該当${total}件）。検索や絞り込みで件数を減らせます。CSV・PDF・要約には全件が反映されます。`;
+      } else {
+        elements.listLimitNotice.hidden = true;
+        elements.listLimitNotice.textContent = "";
       }
     }
 

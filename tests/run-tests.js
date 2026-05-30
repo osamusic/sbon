@@ -137,7 +137,7 @@ function loadAppWithDom(localStorage = mockLocalStorage()) {
     vm.runInNewContext(fs.readFileSync(file, "utf8"), context, { filename: file });
   }
 
-  return { events, get, localStorage };
+  return { events, get, localStorage, window: context.window };
 }
 
 function testCycloneDxSample() {
@@ -464,6 +464,42 @@ function testCsvExportShape() {
   assert.ok(csv.includes("古いOpenSSL系列が使われている可能性があります"));
 }
 
+function testLargeListRendering() {
+  const { get, window } = loadAppWithDom();
+  const viewer = window.SBON_UI.createViewer({
+    parser: window.SBON_PARSER,
+    exporter: window.SBON_EXPORT,
+    differ: window.SBON_DIFF,
+    review: window.SBON_REVIEW,
+  });
+  viewer.start();
+
+  const components = [];
+  for (let i = 0; i < 650; i += 1) {
+    components.push({
+      type: "library",
+      name: `lib-${i}`,
+      version: "1.0.0",
+      bomRef: `pkg:generic/lib-${i}@1.0.0`,
+      purl: `pkg:generic/lib-${i}@1.0.0`,
+      licenses: [{ license: { id: "MIT" } }],
+    });
+  }
+  viewer.loadSbom({ bomFormat: "CycloneDX", specVersion: "1.5", components }, "巨大SBOM");
+
+  // 件数表示は全件、ただし一覧描画は上限で打ち切り、通知を出す。
+  assert.strictEqual(get("#componentCount").textContent, "650 / 650件表示");
+  assert.strictEqual(get("#listLimitNotice").hidden, false);
+  assert.ok(get("#listLimitNotice").textContent.includes("先頭500件"));
+  assert.ok(get("#listLimitNotice").textContent.includes("650"));
+
+  // CSVには全件が含まれる（先頭打ち切りはあくまで一覧表示のみ）。
+  const normalized = window.SBON_PARSER.normalizeSbom({ bomFormat: "CycloneDX", specVersion: "1.5", components });
+  assert.strictEqual(normalized.components.length, 650);
+  const csv = window.SBON_EXPORT.buildCsv(normalized.components);
+  assert.ok(csv.includes("lib-649"), "CSVには表示打ち切り後の項目も含まれる");
+}
+
 function testUiInteractions() {
   const sharedStorage = mockLocalStorage();
   const { events, get } = loadAppWithDom(sharedStorage);
@@ -541,6 +577,7 @@ function run() {
   testDiffLicenseAndCsv();
   testReviewStore();
   testEdgeCases();
+  testLargeListRendering();
   testCpeProductExtraction();
   testAliasMatching();
   testUnknownSbomError();
