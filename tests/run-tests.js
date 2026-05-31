@@ -157,6 +157,9 @@ function testCycloneDxSample() {
   assert.strictEqual(openssl.matchConfidence, "high");
   assert.strictEqual(openssl.reviewPriority, "high");
   assert.strictEqual(openssl.category, "crypto");
+  // Two category axes: openssl carries a perspective category but no component
+  // type, so componentType stays empty.
+  assert.strictEqual(openssl.componentType, "");
   assert.deepStrictEqual(Array.from(openssl.vulnerabilities, (vulnerability) => vulnerability.id), [
     "CVE-2023-0286",
   ]);

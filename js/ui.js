@@ -549,7 +549,7 @@
                 <h4>${escapeHtml(component.name)} ${escapeHtml(component.version)}</h4>
                 <span class="badge ${component.reviewPriority}">${reviewPriorityLabel(component.reviewPriority)}</span>
               </div>
-              <p class="report-detail-meta">${escapeHtml(component.categoryLabel)} ／ ${escapeHtml(identifier)}</p>
+              <p class="report-detail-meta">${escapeHtml(component.categoryLabel)}${component.componentTypeLabel ? `（${escapeHtml(component.componentTypeLabel)}）` : ""} ／ ${escapeHtml(identifier)}</p>
               <p>${escapeHtml(component.explanation)}</p>
               <p class="report-detail-label">確認ポイント</p>
               ${findings}
@@ -591,7 +591,7 @@
           <td><span class="pkg-name">${escapeHtml(component.name)}</span><span class="pkg-id">${escapeHtml(component.purl || component.id)}</span></td>
           <td>${escapeHtml(component.version)}</td>
           <td><span class="badge ${component.reviewPriority}">${reviewPriorityLabel(component.reviewPriority)}</span></td>
-          <td class="category">${escapeHtml(component.categoryLabel)}</td>
+          <td class="category">${escapeHtml(component.categoryLabel)}${component.componentTypeLabel ? `<span class="pkg-id">${escapeHtml(component.componentTypeLabel)}</span>` : ""}</td>
           <td>${escapeHtml(component.licenses.join(", ") || "未確認")}</td>
           <td>${component.vulnerabilities.length}</td>
           <td>${reviewStatusBadge(reviewStatusOf(component))}</td>

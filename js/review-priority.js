@@ -13,6 +13,8 @@
       matchConfidence: match.confidence,
       category: knowledge.category,
       categoryLabel: knowledge.label,
+      componentType: knowledge.componentType,
+      componentTypeLabel: knowledge.componentTypeLabel,
       explanation: knowledge.explanation,
       findings,
       reviewPriority,
@@ -90,19 +92,29 @@
       return {
         category: "unknown",
         label: "不明",
+        componentType: "",
+        componentTypeLabel: "",
         explanation:
           "公開情報や社内台帳で用途を確認してください。用途が不明なOSSは、保守責任と影響範囲が判断しにくい状態です。",
       };
     }
 
     const knowledgeBase = window.SBON_KNOWLEDGE_BASE;
-    const packageCategory = knowledgeBase.packageCategories.find((item) => item.packageId === match.packageId);
-    const category = knowledgeBase.categories.find((item) => item.id === packageCategory?.categoryId);
+    // Categories have two axes: perspective (review angle) and type (component
+    // type). Untyped categories are treated as perspective for compatibility.
+    const linked = knowledgeBase.packageCategories
+      .filter((item) => item.packageId === match.packageId)
+      .map((pc) => knowledgeBase.categories.find((c) => c.id === pc.categoryId))
+      .filter(Boolean);
+    const perspective = linked.find((c) => c.kind !== "type");
+    const type = linked.find((c) => c.kind === "type");
     const entry = knowledgeBase.entriesJa.find((item) => item.packageId === match.packageId);
 
     return {
-      category: category?.id || "unknown",
-      label: category?.labelJa || "不明",
+      category: perspective?.id || "unknown",
+      label: perspective?.labelJa || "不明",
+      componentType: type?.id || "",
+      componentTypeLabel: type?.labelJa || "",
       explanation: entry
         ? `${entry.summary}${entry.whyItMatters ? ` ${entry.whyItMatters}` : ""}`
         : "このコンポーネントの説明は知識ベースに登録されていません。",
