@@ -116,9 +116,32 @@
 
     function start() {
       restoreReviews();
+      populateCategoryFilter();
       bindEvents();
       applyReportScope();
       render();
+    }
+
+    function populateCategoryFilter() {
+      const select = elements.categoryFilter;
+      if (!select) return;
+      const knowledgeBase = window.SBON_KNOWLEDGE_BASE;
+      const categories = knowledgeBase?.categories || [];
+      // component.category only ever holds a perspective id (or "unknown"), so the
+      // "レビュー観点" filter lists perspective categories from the knowledge base
+      // plus an explicit "unknown" bucket. Building from the KB keeps the options in
+      // sync with the latest categorization instead of a hardcoded list.
+      const perspectives = categories
+        .filter((category) => category.kind !== "type")
+        .sort((a, b) => a.labelJa.localeCompare(b.labelJa, "ja"));
+      const options = [
+        { value: "all", label: "すべて" },
+        ...perspectives.map((category) => ({ value: category.id, label: category.labelJa })),
+        { value: "unknown", label: "不明" },
+      ];
+      select.innerHTML = options
+        .map((option) => `<option value="${escapeHtml(option.value)}">${escapeHtml(option.label)}</option>`)
+        .join("");
     }
 
     function applyReportScope() {
