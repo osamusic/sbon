@@ -171,45 +171,47 @@ function testSpdxBasicPackage() {
     spdxVersion: "SPDX-2.3",
     packages: [
       {
-        SPDXID: "SPDXRef-Package-curl",
-        name: "curl",
+        // A fictitious component with no knowledge entry, to exercise the
+        // unmatched ("unknown") path. (Real packages like curl/zlib now match.)
+        SPDXID: "SPDXRef-Package-acme-widget",
+        name: "acme-widget",
         versionInfo: "8.7.1",
-        licenseConcluded: "curl",
+        licenseConcluded: "MIT",
         externalRefs: [
           {
             referenceCategory: "PACKAGE-MANAGER",
             referenceType: "purl",
-            referenceLocator: "pkg:generic/curl@8.7.1",
+            referenceLocator: "pkg:generic/acme-widget@8.7.1",
           },
         ],
       },
       {
-        SPDXID: "SPDXRef-Package-zlib",
-        name: "zlib",
+        SPDXID: "SPDXRef-Package-acme-helper",
+        name: "acme-helper",
         versionInfo: "1.3.1",
-        licenseDeclared: "Zlib",
+        licenseDeclared: "MIT",
       },
     ],
     relationships: [
       {
-        spdxElementId: "SPDXRef-Package-curl",
+        spdxElementId: "SPDXRef-Package-acme-widget",
         relationshipType: "DEPENDS_ON",
-        relatedSpdxElement: "SPDXRef-Package-zlib",
+        relatedSpdxElement: "SPDXRef-Package-acme-helper",
       },
     ],
   });
 
   assert.strictEqual(normalized.format, "SPDX-2.3");
   assert.strictEqual(normalized.components.length, 2);
-  assert.deepStrictEqual(Array.from(normalized.dependencies.get("SPDXRef-Package-curl")), [
-    "SPDXRef-Package-zlib",
+  assert.deepStrictEqual(Array.from(normalized.dependencies.get("SPDXRef-Package-acme-widget")), [
+    "SPDXRef-Package-acme-helper",
   ]);
 
-  const curl = normalized.components.find((component) => component.name === "curl");
-  assert.ok(curl);
-  assert.strictEqual(curl.packageId, null);
-  assert.strictEqual(curl.category, "unknown");
-  assert.strictEqual(curl.reviewPriority, "medium");
+  const widget = normalized.components.find((component) => component.name === "acme-widget");
+  assert.ok(widget);
+  assert.strictEqual(widget.packageId, null);
+  assert.strictEqual(widget.category, "unknown");
+  assert.strictEqual(widget.reviewPriority, "medium");
 }
 
 function testAliasMatching() {

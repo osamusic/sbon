@@ -469,6 +469,20 @@ window.SBON_KNOWLEDGE_PACKAGE_IDENTIFIERS = [
     confidence: "high",
   },
   {
+    packageId: "pkg.curl",
+    identifierType: "purl-name",
+    value: "curl",
+    ecosystem: "generic",
+    confidence: "high",
+  },
+  {
+    packageId: "pkg.curl",
+    identifierType: "regex",
+    value: "^curl$",
+    ecosystem: "generic",
+    confidence: "medium",
+  },
+  {
     packageId: "pkg.debian",
     identifierType: "cpe-product",
     value: "debian_linux",
@@ -3330,6 +3344,20 @@ window.SBON_KNOWLEDGE_PACKAGE_IDENTIFIERS = [
     value: "zlib",
     ecosystem: "generic",
     confidence: "high",
+  },
+  {
+    packageId: "pkg.zlib",
+    identifierType: "purl-name",
+    value: "zlib",
+    ecosystem: "generic",
+    confidence: "high",
+  },
+  {
+    packageId: "pkg.zlib",
+    identifierType: "regex",
+    value: "^(zlib|libz|zlib1g)$",
+    ecosystem: "generic",
+    confidence: "medium",
   },
   {
     packageId: "pkg.zstd-libs",
