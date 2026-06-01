@@ -18,6 +18,12 @@ window.SBON_KNOWLEDGE_CATEGORIES = [
     kind: "perspective",
   },
   {
+    id: "container",
+    labelJa: "コンテナ・オーケストレーション",
+    descriptionJa: "コンテナの実行基盤やオーケストレーションを担うコンポーネントです（Docker、containerd、Kubernetes など）。権限分離やコンテナエスケープ、設定不備の影響が大きく、基盤全体の攻撃面に関わります。",
+    kind: "perspective",
+  },
+  {
     id: "crypto",
     labelJa: "暗号",
     descriptionJa: "暗号化、証明書、鍵管理、通信保護に関係するコンポーネントです。",
