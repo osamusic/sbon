@@ -7,6 +7,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     sourceUrl: null,
   },
   {
+    id: "pkg.alpine",
+    canonicalName: "alpine",
+    displayName: "Alpine Linux",
+    homepageUrl: "https://alpinelinux.org/",
+    sourceUrl: null,
+  },
+  {
     id: "pkg.alpine-baselayout",
     canonicalName: "alpine-baselayout",
     displayName: "alpine-baselayout",
@@ -35,6 +42,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     sourceUrl: null,
   },
   {
+    id: "pkg.android",
+    canonicalName: "android",
+    displayName: "Android",
+    homepageUrl: "https://www.android.com/",
+    sourceUrl: null,
+  },
+  {
     id: "pkg.aom-libs",
     canonicalName: "aom-libs",
     displayName: "aom-libs",
@@ -54,6 +68,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     displayName: "argon2-libs",
     homepageUrl: null,
     sourceUrl: null,
+  },
+  {
+    id: "pkg.binutils",
+    canonicalName: "binutils",
+    displayName: "GNU Binutils",
+    homepageUrl: "https://www.gnu.org/software/binutils/",
+    sourceUrl: "https://sourceware.org/git/binutils-gdb.git",
   },
   {
     id: "pkg.brotli-libs",
@@ -119,6 +140,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     sourceUrl: "https://github.com/curl/curl",
   },
   {
+    id: "pkg.debian",
+    canonicalName: "debian",
+    displayName: "Debian",
+    homepageUrl: "https://www.debian.org/",
+    sourceUrl: null,
+  },
+  {
     id: "pkg.dnsmasq",
     canonicalName: "dnsmasq",
     displayName: "Dnsmasq",
@@ -173,6 +201,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     displayName: "freetype",
     homepageUrl: null,
     sourceUrl: null,
+  },
+  {
+    id: "pkg.gcc",
+    canonicalName: "gcc",
+    displayName: "GCC",
+    homepageUrl: "https://gcc.gnu.org/",
+    sourceUrl: "https://gcc.gnu.org/git/",
   },
   {
     id: "pkg.gdbm",
@@ -581,6 +616,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     sourceUrl: "https://git.kernel.org/",
   },
   {
+    id: "pkg.llvm",
+    canonicalName: "llvm",
+    displayName: "LLVM/Clang",
+    homepageUrl: "https://llvm.org/",
+    sourceUrl: "https://github.com/llvm/llvm-project",
+  },
+  {
     id: "pkg.lodash",
     canonicalName: "lodash",
     displayName: "lodash",
@@ -592,6 +634,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     canonicalName: "lua5.4-libs",
     displayName: "lua5.4-libs",
     homepageUrl: null,
+    sourceUrl: null,
+  },
+  {
+    id: "pkg.macos",
+    canonicalName: "macos",
+    displayName: "macOS",
+    homepageUrl: "https://www.apple.com/macos/",
     sourceUrl: null,
   },
   {
@@ -812,6 +861,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     sourceUrl: "https://github.com/psf/requests",
   },
   {
+    id: "pkg.rhel",
+    canonicalName: "rhel",
+    displayName: "Red Hat Enterprise Linux",
+    homepageUrl: "https://www.redhat.com/en/technologies/linux-platforms/enterprise-linux",
+    sourceUrl: null,
+  },
+  {
     id: "pkg.rsa-2048",
     canonicalName: "rsa-2048",
     displayName: "RSA-2048",
@@ -903,10 +959,31 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     sourceUrl: null,
   },
   {
+    id: "pkg.ubuntu",
+    canonicalName: "ubuntu",
+    displayName: "Ubuntu",
+    homepageUrl: "https://ubuntu.com/",
+    sourceUrl: null,
+  },
+  {
     id: "pkg.wget",
     canonicalName: "wget",
     displayName: "wget",
     homepageUrl: null,
+    sourceUrl: null,
+  },
+  {
+    id: "pkg.windows",
+    canonicalName: "windows",
+    displayName: "Microsoft Windows",
+    homepageUrl: "https://www.microsoft.com/windows",
+    sourceUrl: null,
+  },
+  {
+    id: "pkg.windows-server",
+    canonicalName: "windows-server",
+    displayName: "Windows Server",
+    homepageUrl: "https://www.microsoft.com/windows-server",
     sourceUrl: null,
   },
   {

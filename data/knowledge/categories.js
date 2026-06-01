@@ -8,7 +8,7 @@ window.SBON_KNOWLEDGE_CATEGORIES = [
   {
     id: "build-tool",
     labelJa: "ビルド・パッケージ管理",
-    descriptionJa: "ソフトウェアのビルドや依存パッケージの取得・管理を担うツールです（npm、Maven、pip など）。サプライチェーンの取り込み経路として確認対象になります。",
+    descriptionJa: "ソフトウェアのビルド、コンパイラ・ツールチェーン、依存パッケージの取得・管理を担うツールです（npm、Maven、pip、gcc など）。サプライチェーンの取り込み経路として確認対象になります。",
     kind: "perspective",
   },
   {
@@ -46,6 +46,12 @@ window.SBON_KNOWLEDGE_CATEGORIES = [
     labelJa: "ネットワーク",
     descriptionJa: "外部通信、サーバー、プロキシなど、ネットワーク経由のやり取りに関係するコンポーネントです。",
     kind: "perspective",
+  },
+  {
+    id: "operating-system",
+    labelJa: "オペレーティングシステム",
+    descriptionJa: "製品やイメージの土台となるOS・プラットフォームです（Windows、Linuxディストロ、macOSなど）。サポート期限が製品全体の保守方針に直結します。",
+    kind: "type",
   },
   {
     id: "os",
