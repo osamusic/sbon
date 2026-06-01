@@ -29,6 +29,7 @@
         licenses: parseCycloneDxLicenses(component.licenses),
         purl: component.purl || id,
         cpe: component.cpe || "",
+        cpes: component.cpe ? [component.cpe] : [],
         supplier: component.supplier?.name || "",
         publisher: component.publisher || component.author || "",
         copyright: component.copyright || "",
@@ -75,7 +76,10 @@
         type: "package",
         licenses: parseSpdxLicense(pkg),
         purl: findSpdxExternalRef(pkg, "purl") || "",
-        cpe: findSpdxExternalRef(pkg, "cpe23Type") || findSpdxExternalRef(pkg, "cpe22Type") || "",
+        // SPDX packages routinely declare several CPEs (vendor + distro-package
+        // variants); keep them all so matching can try each, not just the first.
+        cpe: collectSpdxExternalRefs(pkg, ["cpe23Type", "cpe22Type"])[0] || "",
+        cpes: collectSpdxExternalRefs(pkg, ["cpe23Type", "cpe22Type"]),
         supplier: cleanSpdxActor(pkg.supplier),
         publisher: cleanSpdxActor(pkg.originator),
         copyright: pkg.copyrightText && pkg.copyrightText !== "NOASSERTION" ? pkg.copyrightText : "",
@@ -158,6 +162,12 @@
 
   function findSpdxExternalRef(pkg, referenceType) {
     return (pkg.externalRefs || []).find((ref) => ref.referenceType === referenceType)?.referenceLocator || "";
+  }
+
+  function collectSpdxExternalRefs(pkg, referenceTypes) {
+    return (pkg.externalRefs || [])
+      .filter((ref) => referenceTypes.includes(ref.referenceType) && ref.referenceLocator)
+      .map((ref) => ref.referenceLocator);
   }
 
   function cleanSpdxActor(value) {

@@ -24,7 +24,10 @@
   function matchPackage(component) {
     const knowledgeBase = window.SBON_KNOWLEDGE_BASE;
     const purlName = extractPurlName(component.purl);
-    const cpeProduct = extractCpeProduct(component.cpe);
+    // A component may declare several CPEs (vendor + distro-package variants);
+    // match against every product, not just the first.
+    const cpeList = component.cpes && component.cpes.length ? component.cpes : component.cpe ? [component.cpe] : [];
+    const cpeProducts = cpeList.map(extractCpeProduct).filter(Boolean);
     const normalizedName = normalizeName(component.name);
 
     for (const identifier of knowledgeBase.packageIdentifiers) {
@@ -45,8 +48,7 @@
     for (const identifier of knowledgeBase.packageIdentifiers) {
       if (
         identifier.identifierType === "cpe-product" &&
-        cpeProduct &&
-        normalizeName(identifier.value) === cpeProduct
+        cpeProducts.includes(normalizeName(identifier.value))
       ) {
         return {
           packageId: identifier.packageId,

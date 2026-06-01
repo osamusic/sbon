@@ -147,6 +147,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     sourceUrl: "https://review.coreboot.org/coreboot.git",
   },
   {
+    id: "pkg.corepkcs11",
+    canonicalName: "corepkcs11",
+    displayName: "FreeRTOS corePKCS11",
+    homepageUrl: "https://www.freertos.org/Documentation/03-Libraries/03-FreeRTOS-libraries/06-corePKCS11/00-corePKCS11",
+    sourceUrl: "https://github.com/FreeRTOS/corePKCS11",
+  },
+  {
     id: "pkg.cuda",
     canonicalName: "cuda",
     displayName: "NVIDIA CUDA Toolkit",
@@ -731,8 +738,8 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     id: "pkg.lodash",
     canonicalName: "lodash",
     displayName: "lodash",
-    homepageUrl: "https://lodash.com/",
-    sourceUrl: "git+https://github.com/lodash/lodash.git",
+    homepageUrl: null,
+    sourceUrl: null,
   },
   {
     id: "pkg.log4j",
@@ -789,6 +796,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     displayName: "Mbed TLS",
     homepageUrl: "https://www.trustedfirmware.org/projects/mbed-tls/",
     sourceUrl: "https://github.com/Mbed-TLS/mbedtls",
+  },
+  {
+    id: "pkg.mcux-sdk",
+    canonicalName: "mcux-sdk",
+    displayName: "MCUXpresso SDK",
+    homepageUrl: "https://www.nxp.com/mcuxpresso/sdk",
+    sourceUrl: "https://github.com/nxp-mcuxpresso/mcux-sdk",
   },
   {
     id: "pkg.musl",
@@ -903,6 +917,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     sourceUrl: null,
   },
   {
+    id: "pkg.nxmw",
+    canonicalName: "nxmw",
+    displayName: "NXP Middleware (nxmw)",
+    homepageUrl: "https://github.com/NXP/nxmw",
+    sourceUrl: "https://github.com/NXP/nxmw",
+  },
+  {
     id: "pkg.onnxruntime",
     canonicalName: "onnxruntime",
     displayName: "ONNX Runtime",
@@ -980,6 +1001,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     sourceUrl: "https://github.com/pypa/pip",
   },
   {
+    id: "pkg.pkcs11-oasis",
+    canonicalName: "pkcs11-oasis",
+    displayName: "OASIS PKCS#11 (Cryptoki)",
+    homepageUrl: "https://www.oasis-open.org/committees/pkcs11/",
+    sourceUrl: "https://github.com/oasis-tcs/pkcs11",
+  },
+  {
     id: "pkg.pnpm",
     canonicalName: "pnpm",
     displayName: "pnpm",
@@ -1022,6 +1050,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     sourceUrl: "https://github.com/python/cpython",
   },
   {
+    id: "pkg.python-pkcs11",
+    canonicalName: "python-pkcs11",
+    displayName: "python-pkcs11",
+    homepageUrl: "https://python-pkcs11.readthedocs.io/",
+    sourceUrl: "https://github.com/danni/python-pkcs11",
+  },
+  {
     id: "pkg.pytorch",
     canonicalName: "pytorch",
     displayName: "PyTorch",
@@ -1061,7 +1096,7 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     canonicalName: "requests",
     displayName: "requests",
     homepageUrl: null,
-    sourceUrl: "https://github.com/psf/requests",
+    sourceUrl: null,
   },
   {
     id: "pkg.rhel",
@@ -1138,7 +1173,7 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     canonicalName: "snakeyaml",
     displayName: "SnakeYAML",
     homepageUrl: "https://bitbucket.org/snakeyaml/snakeyaml",
-    sourceUrl: "https://bitbucket.org/snakeyaml/snakeyaml/src",
+    sourceUrl: null,
   },
   {
     id: "pkg.spring-boot",

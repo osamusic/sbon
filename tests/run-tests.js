@@ -584,9 +584,52 @@ function testUiInteractions() {
   assert.strictEqual(get("#diffSection").hidden, true);
 }
 
+function testMultiCpeMatching() {
+  const window = loadCore();
+  const normalized = window.SBON_PARSER.normalizeSbom({
+    spdxVersion: "SPDX-2.3",
+    packages: [
+      // mbed TLS: spaced name, github purl, and several distro/vendor CPEs. The
+      // purl-name "mbedtls" anchors it regardless of which CPE comes first.
+      {
+        SPDXID: "SPDXRef-Package-mbedtls",
+        name: "mbed TLS",
+        versionInfo: "3.6.3",
+        externalRefs: [
+          { referenceType: "cpe23Type", referenceLocator: "cpe:2.3:a:debian_package:libmbedcrypto16:3.6.3:1:*:*:*:*:*:*" },
+          { referenceType: "purl", referenceLocator: "pkg:github/Mbed-TLS/mbedtls@v3.6.3" },
+          { referenceType: "cpe23Type", referenceLocator: "cpe:2.3:a:arm:mbed_tls:3.6.3:*:*:*:*:*:*:*" },
+          { referenceType: "cpe23Type", referenceLocator: "cpe:2.3:a:debian_package:libmbedtls-doc:3.6.3:1:*:*:*:*:*:*" },
+        ],
+      },
+      // A package whose FIRST CPE is an unknown variant but a later one is the
+      // canonical openssl product — matching must try every CPE, not just the first.
+      {
+        SPDXID: "SPDXRef-Package-ossl",
+        name: "OpenSSL",
+        versionInfo: "3.5.4",
+        externalRefs: [
+          { referenceType: "cpe23Type", referenceLocator: "cpe:2.3:a:some_distro:openssl-weird:3.5.4:*:*:*:*:*:*:*" },
+          { referenceType: "cpe23Type", referenceLocator: "cpe:2.3:a:openssl:openssl:3.5.4:*:*:*:*:*:*:*" },
+        ],
+      },
+    ],
+  });
+
+  const mbedtls = normalized.components.find((c) => c.name === "mbed TLS");
+  assert.ok(mbedtls);
+  assert.strictEqual(mbedtls.cpes.length, 3, "all three CPEs are collected");
+  assert.strictEqual(mbedtls.packageId, "pkg.mbedtls");
+
+  const ossl = normalized.components.find((c) => c.name === "OpenSSL");
+  assert.strictEqual(ossl.packageId, "pkg.openssl", "matched via a non-first CPE");
+  assert.strictEqual(ossl.matchMethod, "cpe-product");
+}
+
 function run() {
   testCycloneDxSample();
   testSpdxBasicPackage();
+  testMultiCpeMatching();
   testSpdxSampleEnrichment();
   testDiffLogic();
   testDiffLicenseAndCsv();

@@ -749,6 +749,27 @@ window.SBON_KNOWLEDGE_REFERENCES = [
     retrievedAt: "2026-05-31T01:06:15.517Z",
   },
   {
+    packageId: "pkg.python-pkcs11",
+    title: "python-pkcs11 ソースコード",
+    url: "https://github.com/pyauth/python-pkcs11",
+    sourceType: "official",
+    retrievedAt: "2026-06-01T10:55:15.222Z",
+  },
+  {
+    packageId: "pkg.python-pkcs11",
+    title: "python-pkcs11 公式サイト",
+    url: "https://python-pkcs11.readthedocs.io/en/latest/",
+    sourceType: "official",
+    retrievedAt: "2026-06-01T10:55:15.222Z",
+  },
+  {
+    packageId: "pkg.python-pkcs11",
+    title: "ライセンス: MIT",
+    url: "https://spdx.org/licenses/MIT.html",
+    sourceType: "standard",
+    retrievedAt: "2026-06-01T10:55:15.222Z",
+  },
+  {
     packageId: "pkg.pytorch",
     title: "既知の脆弱性 (NVD)",
     url: "https://nvd.nist.gov/vuln/search/results?query=pytorch&search_type=all",
