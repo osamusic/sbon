@@ -87,7 +87,6 @@ function loadAppWithDom(localStorage = mockLocalStorage()) {
     "sort-version",
     "sort-priority",
     "sort-category",
-    "sort-license",
     "sort-vulnerabilities",
   ].map(mockElement);
 
@@ -233,7 +232,7 @@ function testAliasMatching() {
   const libssl = normalized.components[0];
   assert.strictEqual(libssl.packageId, "pkg.openssl");
   assert.strictEqual(libssl.matchMethod, "regex");
-  assert.strictEqual(libssl.matchValue, "^(openssl|libssl|openssl-libs)$");
+  assert.strictEqual(libssl.matchValue, "^(openssl|libssl\\d*|libcrypto\\d*|openssl-libs)$");
   assert.strictEqual(libssl.category, "crypto");
   assert.strictEqual(libssl.reviewPriority, "low");
 }
@@ -554,7 +553,7 @@ function testUiInteractions() {
   events.get("#resetFiltersButton:click")();
   assert.strictEqual(get("#componentCount").textContent, "4 / 4件表示");
 
-  events.get("sort-license:click")();
+  events.get("sort-category:click")();
   assert.strictEqual(get("#componentCount").textContent, "4 / 4件表示");
 
   events.get("#loadSpdxSampleButton:click")();

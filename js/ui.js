@@ -592,7 +592,6 @@
           <td>${escapeHtml(component.version)}</td>
           <td><span class="badge ${component.reviewPriority}">${reviewPriorityLabel(component.reviewPriority)}</span></td>
           <td class="category">${escapeHtml(component.categoryLabel)}${component.componentTypeLabel ? `<span class="pkg-id">${escapeHtml(component.componentTypeLabel)}</span>` : ""}</td>
-          <td>${escapeHtml(component.licenses.join(", ") || "未確認")}</td>
           <td>${component.vulnerabilities.length}</td>
           <td>${reviewStatusBadge(reviewStatusOf(component))}</td>
         `;
@@ -860,9 +859,6 @@
       if (sortKey === "category") {
         return a.categoryLabel.localeCompare(b.categoryLabel);
       }
-      if (sortKey === "license") {
-        return licenseText(a).localeCompare(licenseText(b));
-      }
       if (sortKey === "version") {
         return String(a.version).localeCompare(String(b.version), "ja", { numeric: true });
       }
@@ -889,10 +885,6 @@
       elements.categoryFilter.value = "all";
       state.page = 1;
       render();
-    }
-
-    function licenseText(component) {
-      return component.licenses.join(", ") || "未確認";
     }
 
     function reviewStatusOf(component) {
