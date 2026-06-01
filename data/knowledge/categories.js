@@ -36,6 +36,12 @@ window.SBON_KNOWLEDGE_CATEGORIES = [
     kind: "perspective",
   },
   {
+    id: "firmware",
+    labelJa: "ファームウェア・ブートローダ",
+    descriptionJa: "ブートローダや組み込みファームウェア、RTOSなど、機器の起動・基盤に関わる低レベルコンポーネントです（U-Boot、GRUB、FreeRTOS など）。改ざんや脆弱性が機器全体の信頼性に直結します。",
+    kind: "perspective",
+  },
+  {
     id: "gpu-compute",
     labelJa: "GPU・アクセラレータ",
     descriptionJa: "GPUなどのアクセラレータ向けのドライバ・ランタイム・数値計算ライブラリです（CUDA、cuDNN、ROCm など）。ハードウェア依存やドライバの保守・脆弱性が確認対象になります。",
@@ -46,6 +52,12 @@ window.SBON_KNOWLEDGE_CATEGORIES = [
     labelJa: "言語ライブラリ・依存パッケージ",
     descriptionJa: "プログラミング言語のパッケージ管理経由で導入される依存ライブラリです。",
     kind: "type",
+  },
+  {
+    id: "logging",
+    labelJa: "ロギング・可観測性",
+    descriptionJa: "ログ出力やメトリクス・トレースなどの可観測性を担うコンポーネントです（log4j、OpenTelemetry など）。広く組み込まれるため、脆弱性の影響範囲が大きくなりがちです。",
+    kind: "perspective",
   },
   {
     id: "media",
@@ -78,9 +90,21 @@ window.SBON_KNOWLEDGE_CATEGORIES = [
     kind: "perspective",
   },
   {
+    id: "serialization",
+    labelJa: "シリアライズ・データ処理",
+    descriptionJa: "データのシリアライズ・デシリアライズや構造化データの解析を担うコンポーネントです（Jackson、SnakeYAML、protobuf など）。デシリアライズやXXEなどの脆弱性クラスに関係します。",
+    kind: "perspective",
+  },
+  {
     id: "system-package",
     labelJa: "システム・OSパッケージ",
     descriptionJa: "OSやファームウェアに含まれるシステムレベルのパッケージ・ライブラリです。",
     kind: "type",
+  },
+  {
+    id: "web-framework",
+    labelJa: "Webフレームワーク",
+    descriptionJa: "Webアプリケーションの構築基盤となるフレームワークです（Spring、Django、Rails、React など）。外部入力を直接受けるため、既知の脆弱性や設定不備の影響が大きくなります。",
+    kind: "perspective",
   },
 ];
