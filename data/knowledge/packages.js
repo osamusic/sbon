@@ -70,6 +70,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     sourceUrl: null,
   },
   {
+    id: "pkg.bearssl",
+    canonicalName: "bearssl",
+    displayName: "BearSSL",
+    homepageUrl: "https://bearssl.org/",
+    sourceUrl: "https://bearssl.org/gitweb/",
+  },
+  {
     id: "pkg.binutils",
     canonicalName: "binutils",
     displayName: "GNU Binutils",
@@ -588,6 +595,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     sourceUrl: null,
   },
   {
+    id: "pkg.libsodium",
+    canonicalName: "libsodium",
+    displayName: "libsodium",
+    homepageUrl: "https://libsodium.org/",
+    sourceUrl: "https://github.com/jedisct1/libsodium",
+  },
+  {
     id: "pkg.libtasn1",
     canonicalName: "libtasn1",
     displayName: "libtasn1",
@@ -754,6 +768,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     displayName: "MariaDB",
     homepageUrl: "https://mariadb.org/",
     sourceUrl: "https://github.com/MariaDB/server",
+  },
+  {
+    id: "pkg.matrixssl",
+    canonicalName: "matrixssl",
+    displayName: "MatrixSSL",
+    homepageUrl: "https://github.com/matrixssl/matrixssl",
+    sourceUrl: "https://github.com/matrixssl/matrixssl",
   },
   {
     id: "pkg.maven",
@@ -1251,6 +1272,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     displayName: "Windows Server",
     homepageUrl: "https://www.microsoft.com/windows-server",
     sourceUrl: null,
+  },
+  {
+    id: "pkg.wolfssl",
+    canonicalName: "wolfssl",
+    displayName: "wolfSSL",
+    homepageUrl: "https://www.wolfssl.com/",
+    sourceUrl: "https://github.com/wolfSSL/wolfssl",
   },
   {
     id: "pkg.xz",

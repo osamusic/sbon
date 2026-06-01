@@ -385,6 +385,13 @@ window.SBON_KNOWLEDGE_REFERENCES = [
     retrievedAt: "2026-05-31T01:06:09.476Z",
   },
   {
+    packageId: "pkg.libsodium",
+    title: "既知の脆弱性 (NVD)",
+    url: "https://nvd.nist.gov/vuln/search/results?query=libsodium&search_type=all",
+    sourceType: "database",
+    retrievedAt: "2026-06-01T10:28:03.563Z",
+  },
+  {
     packageId: "pkg.libxml2",
     title: "既知の脆弱性 (NVD)",
     url: "https://nvd.nist.gov/vuln/search/results?query=libxml2&search_type=all",
@@ -530,6 +537,13 @@ window.SBON_KNOWLEDGE_REFERENCES = [
     url: "https://nvd.nist.gov/vuln/search/results?query=mariadb&search_type=all",
     sourceType: "database",
     retrievedAt: "2026-05-31T01:06:15.524Z",
+  },
+  {
+    packageId: "pkg.matrixssl",
+    title: "既知の脆弱性 (NVD)",
+    url: "https://nvd.nist.gov/vuln/search/results?query=matrixssl&search_type=all",
+    sourceType: "database",
+    retrievedAt: "2026-06-01T10:28:00.099Z",
   },
   {
     packageId: "pkg.maven",
@@ -1111,6 +1125,13 @@ window.SBON_KNOWLEDGE_REFERENCES = [
     url: "https://endoflife.date/windows-server",
     sourceType: "vendor",
     retrievedAt: "2026-06-01T09:18:39.406Z",
+  },
+  {
+    packageId: "pkg.wolfssl",
+    title: "既知の脆弱性 (NVD)",
+    url: "https://nvd.nist.gov/vuln/search/results?query=wolfssl&search_type=all",
+    sourceType: "database",
+    retrievedAt: "2026-06-01T10:27:58.194Z",
   },
   {
     packageId: "pkg.xz",
