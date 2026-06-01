@@ -1,5 +1,11 @@
 window.SBON_KNOWLEDGE_CATEGORIES = [
   {
+    id: "ai-ml",
+    labelJa: "AI・機械学習",
+    descriptionJa: "機械学習・AIのフレームワークやモデル実行に関係するコンポーネントです（PyTorch、TensorFlow、transformers など）。学習データや外部モデルの取り込み経路として確認対象になります。",
+    kind: "perspective",
+  },
+  {
     id: "auth",
     labelJa: "認証・アクセス制御",
     descriptionJa: "認証、アクセス制御、鍵や資格情報の管理に関係するコンポーネントです。",
@@ -27,6 +33,12 @@ window.SBON_KNOWLEDGE_CATEGORIES = [
     id: "database",
     labelJa: "データベース",
     descriptionJa: "データの保存・検索を担うコンポーネントです。",
+    kind: "perspective",
+  },
+  {
+    id: "gpu-compute",
+    labelJa: "GPU・アクセラレータ",
+    descriptionJa: "GPUなどのアクセラレータ向けのドライバ・ランタイム・数値計算ライブラリです（CUDA、cuDNN、ROCm など）。ハードウェア依存やドライバの保守・脆弱性が確認対象になります。",
     kind: "perspective",
   },
   {

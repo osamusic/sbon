@@ -133,6 +133,20 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     sourceUrl: "https://github.com/composer/composer",
   },
   {
+    id: "pkg.cuda",
+    canonicalName: "cuda",
+    displayName: "NVIDIA CUDA Toolkit",
+    homepageUrl: "https://developer.nvidia.com/cuda-toolkit",
+    sourceUrl: null,
+  },
+  {
+    id: "pkg.cudnn",
+    canonicalName: "cudnn",
+    displayName: "NVIDIA cuDNN",
+    homepageUrl: "https://developer.nvidia.com/cudnn",
+    sourceUrl: null,
+  },
+  {
     id: "pkg.curl",
     canonicalName: "curl",
     displayName: "curl",
@@ -278,6 +292,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     displayName: "Apache HTTP Server",
     homepageUrl: "https://httpd.apache.org/",
     sourceUrl: "https://github.com/apache/httpd",
+  },
+  {
+    id: "pkg.keras",
+    canonicalName: "keras",
+    displayName: "Keras",
+    homepageUrl: "https://keras.io/",
+    sourceUrl: "https://github.com/keras-team/keras",
   },
   {
     id: "pkg.keyutils-libs",
@@ -686,6 +707,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     sourceUrl: "https://github.com/mysql/mysql-server",
   },
   {
+    id: "pkg.nccl",
+    canonicalName: "nccl",
+    displayName: "NVIDIA NCCL",
+    homepageUrl: "https://developer.nvidia.com/nccl",
+    sourceUrl: "https://github.com/NVIDIA/nccl",
+  },
+  {
     id: "pkg.ncurses-terminfo-base",
     canonicalName: "ncurses-terminfo-base",
     displayName: "ncurses-terminfo-base",
@@ -761,6 +789,20 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     displayName: "NuGet",
     homepageUrl: "https://www.nuget.org/",
     sourceUrl: "https://github.com/NuGet/NuGet.Client",
+  },
+  {
+    id: "pkg.nvidia-driver",
+    canonicalName: "nvidia-driver",
+    displayName: "NVIDIA GPU Driver",
+    homepageUrl: "https://www.nvidia.com/Download/index.aspx",
+    sourceUrl: null,
+  },
+  {
+    id: "pkg.onnxruntime",
+    canonicalName: "onnxruntime",
+    displayName: "ONNX Runtime",
+    homepageUrl: "https://onnxruntime.ai/",
+    sourceUrl: "https://github.com/microsoft/onnxruntime",
   },
   {
     id: "pkg.openssh",
@@ -840,6 +882,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     sourceUrl: "https://github.com/python/cpython",
   },
   {
+    id: "pkg.pytorch",
+    canonicalName: "pytorch",
+    displayName: "PyTorch",
+    homepageUrl: "https://pytorch.org/",
+    sourceUrl: "https://github.com/pytorch/pytorch",
+  },
+  {
     id: "pkg.readline",
     canonicalName: "readline",
     displayName: "readline",
@@ -868,6 +917,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     sourceUrl: null,
   },
   {
+    id: "pkg.rocm",
+    canonicalName: "rocm",
+    displayName: "AMD ROCm",
+    homepageUrl: "https://www.amd.com/en/products/software/rocm.html",
+    sourceUrl: "https://github.com/ROCm/ROCm",
+  },
+  {
     id: "pkg.rsa-2048",
     canonicalName: "rsa-2048",
     displayName: "RSA-2048",
@@ -894,6 +950,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     displayName: "scanelf",
     homepageUrl: null,
     sourceUrl: null,
+  },
+  {
+    id: "pkg.scikit-learn",
+    canonicalName: "scikit-learn",
+    displayName: "scikit-learn",
+    homepageUrl: "https://scikit-learn.org/",
+    sourceUrl: "https://github.com/scikit-learn/scikit-learn",
   },
   {
     id: "pkg.setpriv",
@@ -931,6 +994,20 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     sourceUrl: "https://github.com/systemd/systemd",
   },
   {
+    id: "pkg.tensorflow",
+    canonicalName: "tensorflow",
+    displayName: "TensorFlow",
+    homepageUrl: "https://www.tensorflow.org/",
+    sourceUrl: "https://github.com/tensorflow/tensorflow",
+  },
+  {
+    id: "pkg.tensorrt",
+    canonicalName: "tensorrt",
+    displayName: "NVIDIA TensorRT",
+    homepageUrl: "https://developer.nvidia.com/tensorrt",
+    sourceUrl: null,
+  },
+  {
     id: "pkg.tiff",
     canonicalName: "tiff",
     displayName: "tiff",
@@ -950,6 +1027,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     displayName: "Apache Tomcat",
     homepageUrl: "https://tomcat.apache.org/",
     sourceUrl: "https://github.com/apache/tomcat",
+  },
+  {
+    id: "pkg.transformers",
+    canonicalName: "transformers",
+    displayName: "Hugging Face Transformers",
+    homepageUrl: "https://huggingface.co/docs/transformers",
+    sourceUrl: "https://github.com/huggingface/transformers",
   },
   {
     id: "pkg.tzdata",
