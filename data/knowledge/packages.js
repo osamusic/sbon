@@ -1,5 +1,12 @@
 window.SBON_KNOWLEDGE_PACKAGES = [
   {
+    id: "pkg.aes-256-gcm",
+    canonicalName: "aes-256-gcm",
+    displayName: "AES-256-GCM",
+    homepageUrl: null,
+    sourceUrl: null,
+  },
+  {
     id: "pkg.alpine-baselayout",
     canonicalName: "alpine-baselayout",
     displayName: "alpine-baselayout",
@@ -110,6 +117,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     displayName: "Dropbear SSH",
     homepageUrl: "https://matt.ucc.asn.au/dropbear/dropbear.html",
     sourceUrl: "https://github.com/mkj/dropbear",
+  },
+  {
+    id: "pkg.example.com",
+    canonicalName: "example.com",
+    displayName: "example.com",
+    homepageUrl: null,
+    sourceUrl: null,
   },
   {
     id: "pkg.expat",
@@ -749,6 +763,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     sourceUrl: null,
   },
   {
+    id: "pkg.rsa-2048",
+    canonicalName: "rsa-2048",
+    displayName: "RSA-2048",
+    homepageUrl: null,
+    sourceUrl: null,
+  },
+  {
     id: "pkg.ruby",
     canonicalName: "ruby",
     displayName: "Ruby",
@@ -801,6 +822,13 @@ window.SBON_KNOWLEDGE_PACKAGES = [
     id: "pkg.tiff",
     canonicalName: "tiff",
     displayName: "tiff",
+    homepageUrl: null,
+    sourceUrl: null,
+  },
+  {
+    id: "pkg.tlsv1.2",
+    canonicalName: "tlsv1.2",
+    displayName: "TLSv1.2",
     homepageUrl: null,
     sourceUrl: null,
   },

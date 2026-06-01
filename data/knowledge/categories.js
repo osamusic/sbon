@@ -12,6 +12,12 @@ window.SBON_KNOWLEDGE_CATEGORIES = [
     kind: "perspective",
   },
   {
+    id: "crypto-asset",
+    labelJa: "暗号資産",
+    descriptionJa: "CBOMで申告された暗号アルゴリズム・証明書・鍵・プロトコルなどの暗号資産です。",
+    kind: "type",
+  },
+  {
     id: "database",
     labelJa: "データベース",
     descriptionJa: "データの保存・検索を担うコンポーネントです。",

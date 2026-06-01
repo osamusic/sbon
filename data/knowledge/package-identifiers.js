@@ -1,5 +1,12 @@
 window.SBON_KNOWLEDGE_PACKAGE_IDENTIFIERS = [
   {
+    packageId: "pkg.aes-256-gcm",
+    identifierType: "name",
+    value: "AES-256-GCM",
+    ecosystem: "generic",
+    confidence: "high",
+  },
+  {
     packageId: "pkg.alpine-baselayout",
     identifierType: "cpe-product",
     value: "alpine-baselayout",
@@ -179,6 +186,13 @@ window.SBON_KNOWLEDGE_PACKAGE_IDENTIFIERS = [
     identifierType: "purl-name",
     value: "cjson",
     ecosystem: "apk",
+    confidence: "high",
+  },
+  {
+    packageId: "pkg.example.com",
+    identifierType: "name",
+    value: "example.com",
+    ecosystem: "generic",
     confidence: "high",
   },
   {
@@ -1183,6 +1197,13 @@ window.SBON_KNOWLEDGE_PACKAGE_IDENTIFIERS = [
     confidence: "high",
   },
   {
+    packageId: "pkg.rsa-2048",
+    identifierType: "name",
+    value: "RSA-2048",
+    ecosystem: "generic",
+    confidence: "high",
+  },
+  {
     packageId: "pkg.scanelf",
     identifierType: "cpe-product",
     value: "scanelf",
@@ -1243,6 +1264,13 @@ window.SBON_KNOWLEDGE_PACKAGE_IDENTIFIERS = [
     identifierType: "purl-name",
     value: "tiff",
     ecosystem: "apk",
+    confidence: "high",
+  },
+  {
+    packageId: "pkg.tlsv1.2",
+    identifierType: "name",
+    value: "TLSv1.2",
+    ecosystem: "generic",
     confidence: "high",
   },
   {
