@@ -26,103 +26,133 @@
     />
     <meta name="twitter:image" content="https://sbon.osamusic.org/sbon_banner.png" />
     <link rel="icon" type="image/png" href="./sbon_logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./styles.css" />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem("sbon-theme");
+          var theme =
+            saved ||
+            (window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light");
+          document.documentElement.dataset.theme = theme;
+        } catch (e) {
+          document.documentElement.dataset.theme = "light";
+        }
+      })();
+    </script>
   </head>
   <body>
     <header class="topbar">
-      <div class="logo-container">
-        <img src="./sbon_logo.png" alt="SBON Logo" class="sbon-logo" />
-        <div>
-          <p class="eyebrow">SBOM Viewer</p>
-          <h1>SBON<span class="brand-reading">エスボン</span> <span class="trial-tag">トライアル版</span></h1>
-        </div>
-      </div>
-      <div class="actions">
-        <button id="loadSampleButton" type="button" class="secondary-button" title="CycloneDXサンプルを読み込む">
-          <span aria-hidden="true">◎</span>
-          CycloneDX例
-        </button>
-        <button id="loadSpdxSampleButton" type="button" class="secondary-button" title="SPDXサンプルを読み込む">
-          <span aria-hidden="true">◎</span>
-          SPDX例
-        </button>
-        <label class="report-scope-field" title="PDFに含める範囲">
-          <span>出力範囲</span>
-          <select id="reportScope">
-            <option value="both">調達＋技術</option>
-            <option value="procurement">調達向け概要</option>
-            <option value="technical">技術向け詳細</option>
-          </select>
-        </label>
-        <button id="printButton" type="button" title="PDFとして保存">
-          <span aria-hidden="true">□</span>
-          PDF
-        </button>
-        <button id="csvButton" type="button" title="CSVを書き出す">
-          <span aria-hidden="true">↓</span>
-          CSV
-        </button>
-        <button id="saveReviewButton" type="button" class="secondary-button" title="レビュー結果をJSONで保存">
-          <span aria-hidden="true">▣</span>
-          レビュー保存
-        </button>
-        <button id="loadReviewButton" type="button" class="secondary-button" title="保存したレビュー結果を読み込む">
-          <span aria-hidden="true">▢</span>
-          レビュー読込
-        </button>
-        <input id="reviewFileInput" type="file" accept=".json,application/json" hidden />
-      </div>
+      <a class="brand" href="#" aria-label="SBON ホーム">
+        <img src="./sbon_logo.png" alt="" class="sbon-logo" />
+        <span class="brand-text">
+          <span class="brand-name">SBON<span class="brand-reading">エスボン</span></span>
+          <span class="brand-tag">SBOM Viewer</span>
+        </span>
+      </a>
+      <nav class="topnav" aria-label="サンプル">
+        <span class="topnav-label">サンプル読み込み</span>
+        <button id="loadSampleButton" type="button" class="ghost-button" title="CycloneDXサンプルを読み込む">CycloneDX</button>
+        <button id="loadSpdxSampleButton" type="button" class="ghost-button" title="SPDXサンプルを読み込む">SPDX</button>
+      </nav>
+      <button id="themeToggle" type="button" class="theme-toggle" title="テーマを切り替え" aria-label="テーマを切り替え">
+        <span class="theme-icon theme-icon-sun" aria-hidden="true">☀</span>
+        <span class="theme-icon theme-icon-moon" aria-hidden="true">☾</span>
+      </button>
+      <span class="trial-pill">トライアル版</span>
     </header>
 
     <main>
-      <aside class="trial-notice" role="note">
-        <span class="trial-notice-tag" aria-hidden="true">TRIAL</span>
-        <p>
-          本サイトは<strong>トライアル版</strong>です。動作確認・評価を目的としており、
-          機能や表示内容、知識ベースは予告なく変更される場合があります。確認結果は参考情報としてご利用ください。
-        </p>
-      </aside>
-
-      <section class="hero-banner" aria-hidden="true">
-        <img src="./sbon_banner.png" alt="" class="hero-banner-img" />
-      </section>
-
-      <section class="input-band">
-        <div class="input-copy">
-          <div class="input-copy-text">
-            <h2>調達・品質保証・セキュリティ管理向けのSBOM確認</h2>
-            <p>
-              CycloneDX JSON または SPDX JSON を読み込み、OSSコンポーネントを日本語で説明し、
-              脆弱性・ライセンス・保守上の確認事項を整理できます。
-            </p>
-            <p class="privacy-note">
-              <span aria-hidden="true">🔒</span>
-              読み込んだファイルはお使いのブラウザ内だけで処理され、サーバーには送信されません。
+      <section class="hero" aria-labelledby="heroHeading">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>CycloneDX / SPDX 対応</p>
+            <h1 id="heroHeading">SBOMを、<br />誰でも読める言葉に。</h1>
+            <p class="hero-lede">
+              英語と専門用語ばかりのSBOMも、読み込むだけで日本語の解説に。
+              含まれるOSSの役割・脆弱性・ライセンスを噛み砕いて整理するから、
+              調達・品質保証・セキュリティ管理の担当者がそのまま「何を確認すべきか」を判断できます。
             </p>
             <div class="hero-cta">
               <button id="trySampleButton" type="button" class="cta-button">
                 <span aria-hidden="true">▶</span>
                 サンプルSBOMで試す
               </button>
-              <button id="trySpdxSampleButton" type="button" class="cta-link">SPDXのサンプルを見る</button>
-              <span class="hero-cta-sub">ファイル不要・1クリックで動作を確認できます</span>
+              <button id="trySpdxSampleButton" type="button" class="cta-link">SPDXのサンプルを見る →</button>
+            </div>
+            <ul class="hero-trust">
+              <li><span class="trust-mark" aria-hidden="true">🔒</span>ファイルはブラウザ内だけで処理</li>
+              <li><span class="trust-mark" aria-hidden="true">✓</span>登録・インストール不要</li>
+              <li><span class="trust-mark" aria-hidden="true">¥</span>無料で利用可能</li>
+            </ul>
+          </div>
+
+          <div class="hero-preview" aria-hidden="true">
+            <div class="preview-card">
+              <div class="preview-head">
+                <span class="preview-dots"><i></i><i></i><i></i></span>
+                <span class="preview-file">firmware-v2.1.cdx.json</span>
+                <span class="preview-fmt">CycloneDX 1.5</span>
+              </div>
+              <div class="preview-stats">
+                <div class="pv-stat"><span class="pv-num">128</span><span class="pv-lbl">コンポーネント</span></div>
+                <div class="pv-stat pv-high"><span class="pv-num">7</span><span class="pv-lbl">最優先確認</span></div>
+                <div class="pv-stat pv-med"><span class="pv-num">15</span><span class="pv-lbl">要確認</span></div>
+              </div>
+              <ul class="preview-rows">
+                <li>
+                  <span class="pv-name">openssl<em>1.1.1w</em></span>
+                  <span class="pv-cat">暗号</span>
+                  <span class="pv-badge high">高</span>
+                </li>
+                <li>
+                  <span class="pv-name">busybox<em>1.31.1</em></span>
+                  <span class="pv-cat">OS基盤</span>
+                  <span class="pv-badge high">高</span>
+                </li>
+                <li>
+                  <span class="pv-name">zlib<em>1.2.11</em></span>
+                  <span class="pv-cat">圧縮</span>
+                  <span class="pv-badge med">中</span>
+                </li>
+                <li>
+                  <span class="pv-name">libcurl<em>7.68.0</em></span>
+                  <span class="pv-cat">ネットワーク</span>
+                  <span class="pv-badge low">低</span>
+                </li>
+              </ul>
             </div>
           </div>
-          <img src="./sbon_hero.png" alt="" class="input-hero" aria-hidden="true" />
+        </div>
+      </section>
+
+      <section class="input-band" aria-label="SBOMの読み込み">
+        <div class="input-intro">
+          <h2>SBOMを読み込む</h2>
+          <p>CycloneDX JSON または SPDX JSON に対応。読み込んだファイルはお使いのブラウザ内だけで処理されます。</p>
+          <div class="compare-loader">
+            <span class="compare-label">リリース差分</span>
+            <button id="loadCompareButton" type="button" class="secondary-button">比較対象（旧SBOM）を選択</button>
+            <input id="compareFileInput" type="file" accept=".json,application/json" hidden />
+            <button id="loadDiffSampleButton" type="button" class="link-button">サンプルで差分を見る</button>
+          </div>
         </div>
         <label class="dropzone" for="fileInput" id="dropzone">
           <input id="fileInput" type="file" accept=".json,application/json" />
           <span class="drop-icon" aria-hidden="true">+</span>
           <strong>SBOM JSONを選択</strong>
-          <span>またはここへドラッグ</span>
+          <span>またはここへドラッグ＆ドロップ</span>
         </label>
         <p id="loadStatus" class="load-status" role="status" aria-live="polite" hidden></p>
-        <div class="compare-loader">
-          <span class="compare-label">リリース差分:</span>
-          <button id="loadCompareButton" type="button" class="secondary-button">比較対象（旧SBOM）を選択</button>
-          <input id="compareFileInput" type="file" accept=".json,application/json" hidden />
-          <button id="loadDiffSampleButton" type="button" class="link-button">サンプルで差分を見る</button>
-        </div>
       </section>
 
       <section class="summary-grid" aria-label="概要">
@@ -143,6 +173,28 @@
           <strong id="vulnerabilityCount">0</strong>
         </article>
       </section>
+
+      <div class="workspace-toolbar" role="region" aria-label="出力・レビュー">
+        <label class="report-scope-field" title="PDFに含める範囲">
+          <span>出力範囲</span>
+          <select id="reportScope">
+            <option value="both">調達＋技術</option>
+            <option value="procurement">調達向け概要</option>
+            <option value="technical">技術向け詳細</option>
+          </select>
+        </label>
+        <span class="toolbar-spacer"></span>
+        <button id="printButton" type="button" class="secondary-button" title="PDFとして保存">
+          <span aria-hidden="true">□</span> PDF
+        </button>
+        <button id="csvButton" type="button" class="secondary-button" title="CSVを書き出す">
+          <span aria-hidden="true">↓</span> CSV
+        </button>
+        <span class="toolbar-divider" aria-hidden="true"></span>
+        <button id="saveReviewButton" type="button" class="secondary-button" title="レビュー結果をJSONで保存">レビュー保存</button>
+        <button id="loadReviewButton" type="button" class="secondary-button" title="保存したレビュー結果を読み込む">レビュー読込</button>
+        <input id="reviewFileInput" type="file" accept=".json,application/json" hidden />
+      </div>
 
       <section id="printReport" class="print-report" data-scope="both" aria-label="印刷用レポート">
         <div class="report-head">
@@ -334,5 +386,19 @@
     <script src="./js/export.js"></script>
     <script src="./js/ui.js"></script>
     <script src="./app.js"></script>
+    <script>
+      (function () {
+        var btn = document.getElementById("themeToggle");
+        if (!btn) return;
+        btn.addEventListener("click", function () {
+          var next =
+            document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+          document.documentElement.dataset.theme = next;
+          try {
+            localStorage.setItem("sbon-theme", next);
+          } catch (e) {}
+        });
+      })();
+    </script>
   </body>
 </html>
