@@ -40,6 +40,3 @@ npm test
 - `data/knowledge/`: 説明・識別子・カテゴリ・確認優先度ルールの知識ベース
 - `samples/`: サンプルSBOM
 - `tests/`: パーサと確認優先度判定のテスト
-- `mvp.md`: MVPコンセプト
-- `plan.md`: 開発計画
-- `knowledge-base-design.md`: 説明・確認優先度知識ベースの設計
