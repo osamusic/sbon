@@ -1146,10 +1146,14 @@
     const references = (component.references || []).filter((reference) => reference.url);
     if (references.length) {
       const links = references
-        .map(
-          (reference) =>
-            `<a href="${escapeHtml(reference.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(reference.type)}</a>`,
-        )
+        .map((reference) => {
+          const url = safeUrl(reference.url);
+          // SBOM由来のURLは信頼できない。http(s)/mailto以外（javascript: など）は
+          // リンク化せずラベルだけ表示し、クリックによるスクリプト実行を防ぐ。
+          return url
+            ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(reference.type)}</a>`
+            : escapeHtml(reference.type);
+        })
         .join("、");
       rows.push(["参照リンク", links, true]);
     }
@@ -1178,6 +1182,12 @@
 
   function reviewPriorityRank(reviewPriority) {
     return { high: 0, medium: 1, low: 2 }[reviewPriority] ?? 9;
+  }
+
+  function safeUrl(value) {
+    const url = String(value).trim();
+    // http(s) と mailto のみ許可。javascript:/data: などのスキームは拒否する。
+    return /^(?:https?:|mailto:)/i.test(url) ? url : "";
   }
 
   function escapeHtml(value) {

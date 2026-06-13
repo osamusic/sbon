@@ -2,6 +2,17 @@
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
+    <!--
+      プライバシー保証の技術的強制: connect-src 'none' で fetch/XHR/WebSocket/
+      sendBeacon を全面遮断し、読み込んだSBOMが外部へ送信されないことを保証する
+      （このアプリは元々ネットワーク送信を行わないため副作用はない）。
+      script-src/default-src は file:// での直接表示を壊すため意図的に含めない。
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <meta name="referrer" content="no-referrer" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>SBON - SBOMビューア | 調達・品質保証・セキュリティ向けSBOM確認ツール</title>
     <meta
